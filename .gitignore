@@ -1,0 +1,104 @@
+# DNA files
+*.gfa
+*.fq
+*.fq.*
+*.fastq
+*.fastq.*
+*.fa
+*.fa.*
+*.fasta
+*.fasta.*
+*.bam
+*.bam.*
+*.sam
+*.vcf
+*.vcf.*
+*.saf*
+*.beagle*
+*.beagle.gz
+*.glf*
+*.mafs
+*.snpStat
+*.hwe
+*.geno
+*.npy
+*.sites
+*.sites.txt
+
+# BIG Files
+*.gz
+*.ld
+*.LD_blocks
+*.dat
+*fqscrn.tar.gz
+*depth*
+*lmiss*
+*before*
+*zip
+*.json
+*.json.*
+hmmsearch_out.log
+*.cvg
+*.fna
+*.fna.*
+.scafSeq
+*.bed
+*fastp.html
+*fastqc.html
+*screen.[a-z]*
+*screen.[A-Z]*
+*.log
+
+#mkBAM large files
+dnacomp.txt
+misincorporation.txt
+Fragmisincorporation_plot.pdf
+
+# filterVCF large files
+*.rds
+*.AD.tsv
+*.GT.tsv
+
+# mkBGL large files
+*.pos*
+
+# Other large files
+*fromPROBES.stats
+*fromPROBES.bed
+
+# Archives
+*.tar
+*.tar.*
+# Specific files
+spratelloides_gracilis/mkBAMbaitREF_contam/mapped.ssl.Sgr-SgC0072C-contam-R1R2-noIsolate-fromPROBES.bed
+
+# Directories
+dDocentHPC/
+dDocentHPC*/
+fltrVCF/
+fltrVCF*/
+rad_haplotyper/
+SPA*/
+SPAdes*/
+SPAdes_R1R2_noIsolate_decontam/
+busco_c*/
+busco_s*/
+busco_d*/
+*/logs/probes_ann*out
+probes_ann*
+pire_*_processing/
+augustus_config_dir/
+*busco_c*/
+tmp/
+logs/
+logfiles/
+
+# Allow these files to sync
+!depth_coverage/
+!*[Dd]ecode.*.tsv
+!*[Dd]ecode*tsv
+!multiqc_general_stats.txt
+!multiqc_fastqc.txt
+!mqc_fastp_filtered_reads_plot_1.txt
+!multiqc_fastq_screen.txt
+!*ReadStats.tsv
