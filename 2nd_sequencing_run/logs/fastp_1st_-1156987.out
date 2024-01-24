@@ -1,0 +1,4 @@
+
+mkdir: cannot create directory ‘fq_fp1’: File exists
+mkdir: cannot create directory ‘fq_fp1/failed’: File exists
+slurmstepd: error: *** JOB 1156987 ON d4-w6420b-10 CANCELLED AT 2022-11-09T11:23:41 ***

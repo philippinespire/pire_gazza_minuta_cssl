@@ -1,0 +1,2013 @@
+
+mkdir: cannot create directory ‘fq_fp1_clmp_fp2’: File exists
+mkdir: cannot create directory ‘fq_fp1_clmp_fp2/failed’: File exists
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 350118
+total bases: 43311748
+Q20 bases: 41625985(96.1078%)
+Q30 bases: 39312031(90.7653%)
+
+Read2 before filtering:
+total reads: 350118
+total bases: 43348524
+Q20 bases: 41496831(95.7284%)
+Q30 bases: 38858656(89.6424%)
+
+Read1 after filtering:
+total reads: 346077
+total bases: 42132207
+Q20 bases: 40945971(97.1845%)
+Q30 bases: 38825700(92.1521%)
+
+Read2 aftering filtering:
+total reads: 346077
+total bases: 42146320
+Q20 bases: 40825958(96.8672%)
+Q30 bases: 38390287(91.0881%)
+
+Filtering result:
+reads passed filter: 692154
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 8082
+reads with adapter trimmed: 8336
+bases trimmed due to adapters: 46585
+reads corrected by overlap analysis: 110041
+bases corrected by overlap analysis: 191496
+
+Duplication rate: 9.73578%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_014-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_014-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_014-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_014-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_014-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_014-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_014-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_014-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_014-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_014-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_014-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 40 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 1539842
+total bases: 182050974
+Q20 bases: 175447133(96.3725%)
+Q30 bases: 166337734(91.3688%)
+
+Read2 before filtering:
+total reads: 1539842
+total bases: 182194827
+Q20 bases: 174537584(95.7972%)
+Q30 bases: 163655755(89.8246%)
+
+Read1 after filtering:
+total reads: 1522511
+total bases: 177206960
+Q20 bases: 172587437(97.3931%)
+Q30 bases: 164269267(92.6991%)
+
+Read2 aftering filtering:
+total reads: 1522511
+total bases: 177207502
+Q20 bases: 171731917(96.9101%)
+Q30 bases: 161691160(91.244%)
+
+Filtering result:
+reads passed filter: 3045022
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 34662
+reads with adapter trimmed: 33430
+bases trimmed due to adapters: 143003
+reads corrected by overlap analysis: 381684
+bases corrected by overlap analysis: 687333
+
+Duplication rate: 11.003%
+
+Insert size peak (evaluated by paired-end reads): 102
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_004-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_004-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_004-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_004-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_004-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_004-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_004-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_004-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_004-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_004-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_004-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 58 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2425418
+total bases: 271515358
+Q20 bases: 262031014(96.5069%)
+Q30 bases: 248774522(91.6245%)
+
+Read2 before filtering:
+total reads: 2425418
+total bases: 271727769
+Q20 bases: 262523862(96.6128%)
+Q30 bases: 248713413(91.5304%)
+
+Read1 after filtering:
+total reads: 2402521
+total bases: 265293006
+Q20 bases: 258579563(97.4694%)
+Q30 bases: 246339612(92.8557%)
+
+Read2 aftering filtering:
+total reads: 2402521
+total bases: 265608209
+Q20 bases: 259059311(97.5344%)
+Q30 bases: 246261519(92.7161%)
+
+Filtering result:
+reads passed filter: 4805042
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 45794
+reads with adapter trimmed: 59210
+bases trimmed due to adapters: 219229
+reads corrected by overlap analysis: 599793
+bases corrected by overlap analysis: 1015112
+
+Duplication rate: 7.64141%
+
+Insert size peak (evaluated by paired-end reads): 100
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_019-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_019-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_019-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_019-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_019-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_019-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_019-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_019-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_019-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_019-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_019-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 86 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 3156893
+total bases: 367475696
+Q20 bases: 355589988(96.7656%)
+Q30 bases: 338469700(92.1067%)
+
+Read2 before filtering:
+total reads: 3156893
+total bases: 367740551
+Q20 bases: 354185406(96.3139%)
+Q30 bases: 333793782(90.7688%)
+
+Read1 after filtering:
+total reads: 3126083
+total bases: 358943397
+Q20 bases: 350551642(97.6621%)
+Q30 bases: 334816249(93.2783%)
+
+Read2 aftering filtering:
+total reads: 3126083
+total bases: 358946155
+Q20 bases: 349196481(97.2838%)
+Q30 bases: 330279607(92.0137%)
+
+Filtering result:
+reads passed filter: 6252166
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 61620
+reads with adapter trimmed: 63940
+bases trimmed due to adapters: 239286
+reads corrected by overlap analysis: 660503
+bases corrected by overlap analysis: 1183382
+
+Duplication rate: 9.23598%
+
+Insert size peak (evaluated by paired-end reads): 96
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_010-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_010-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_010-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_010-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_010-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_010-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_010-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_010-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_010-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_010-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_010-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 88 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 1957777
+total bases: 228264772
+Q20 bases: 219322771(96.0826%)
+Q30 bases: 207050786(90.7064%)
+
+Read2 before filtering:
+total reads: 1957777
+total bases: 228543685
+Q20 bases: 218330432(95.5312%)
+Q30 bases: 204434432(89.4509%)
+
+Read1 after filtering:
+total reads: 1929938
+total bases: 221534665
+Q20 bases: 215287286(97.18%)
+Q30 bases: 204107943(92.1336%)
+
+Read2 aftering filtering:
+total reads: 1929938
+total bases: 221382020
+Q20 bases: 214284368(96.7939%)
+Q30 bases: 201584345(91.0572%)
+
+Filtering result:
+reads passed filter: 3859876
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 55678
+reads with adapter trimmed: 57312
+bases trimmed due to adapters: 263091
+reads corrected by overlap analysis: 558751
+bases corrected by overlap analysis: 1017106
+
+Duplication rate: 7.87252%
+
+Insert size peak (evaluated by paired-end reads): 107
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_025-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_025-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_025-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_025-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_025-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_025-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_025-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_025-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_025-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_025-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_025-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 99 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2376352
+total bases: 305537152
+Q20 bases: 293431094(96.0378%)
+Q30 bases: 277248067(90.7412%)
+
+Read2 before filtering:
+total reads: 2376352
+total bases: 305769364
+Q20 bases: 290443266(94.9877%)
+Q30 bases: 269336517(88.0849%)
+
+Read1 after filtering:
+total reads: 2343913
+total bases: 296015087
+Q20 bases: 287670586(97.1811%)
+Q30 bases: 273035175(92.2369%)
+
+Read2 aftering filtering:
+total reads: 2343913
+total bases: 295639857
+Q20 bases: 284682326(96.2936%)
+Q30 bases: 265294182(89.7356%)
+
+Filtering result:
+reads passed filter: 4687826
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 64878
+reads with adapter trimmed: 45242
+bases trimmed due to adapters: 225235
+reads corrected by overlap analysis: 679636
+bases corrected by overlap analysis: 1228410
+
+Duplication rate: 16.035%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_001-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_001-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_001-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_001-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_001-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_001-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_001-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_001-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_001-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_001-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_001-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 99 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2201888
+total bases: 279093217
+Q20 bases: 268762786(96.2986%)
+Q30 bases: 254607181(91.2266%)
+
+Read2 before filtering:
+total reads: 2201888
+total bases: 279259728
+Q20 bases: 266314762(95.3645%)
+Q30 bases: 248076883(88.8337%)
+
+Read1 after filtering:
+total reads: 2174817
+total bases: 271187637
+Q20 bases: 263972853(97.3396%)
+Q30 bases: 251102989(92.5938%)
+
+Read2 aftering filtering:
+total reads: 2174817
+total bases: 270986014
+Q20 bases: 261593787(96.5341%)
+Q30 bases: 244754345(90.3199%)
+
+Filtering result:
+reads passed filter: 4349634
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 54142
+reads with adapter trimmed: 40960
+bases trimmed due to adapters: 195250
+reads corrected by overlap analysis: 569943
+bases corrected by overlap analysis: 1022071
+
+Duplication rate: 13.802%
+
+Insert size peak (evaluated by paired-end reads): 107
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_011-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_011-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_011-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_011-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_011-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_011-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_011-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_011-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_011-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_011-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_011-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 99 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 1998498
+total bases: 254512139
+Q20 bases: 244590030(96.1015%)
+Q30 bases: 231203862(90.842%)
+
+Read2 before filtering:
+total reads: 1998498
+total bases: 254673683
+Q20 bases: 242688859(95.294%)
+Q30 bases: 225817024(88.6692%)
+
+Read1 after filtering:
+total reads: 1974535
+total bases: 247088686
+Q20 bases: 240201050(97.2125%)
+Q30 bases: 228025075(92.2847%)
+
+Read2 aftering filtering:
+total reads: 1974535
+total bases: 246840559
+Q20 bases: 238224169(96.5093%)
+Q30 bases: 222683700(90.2136%)
+
+Filtering result:
+reads passed filter: 3949070
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 47926
+reads with adapter trimmed: 36270
+bases trimmed due to adapters: 196421
+reads corrected by overlap analysis: 582061
+bases corrected by overlap analysis: 1022981
+
+Duplication rate: 15.7015%
+
+Insert size peak (evaluated by paired-end reads): 112
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_013-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_013-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_013-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_013-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_013-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_013-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_013-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_013-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_013-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_013-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_013-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 99 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2941446
+total bases: 339448270
+Q20 bases: 328414636(96.7495%)
+Q30 bases: 312479152(92.055%)
+
+Read2 before filtering:
+total reads: 2941446
+total bases: 339700461
+Q20 bases: 327558087(96.4256%)
+Q30 bases: 309188867(91.0181%)
+
+Read1 after filtering:
+total reads: 2912566
+total bases: 331565343
+Q20 bases: 323764031(97.6471%)
+Q30 bases: 309112763(93.2283%)
+
+Read2 aftering filtering:
+total reads: 2912566
+total bases: 331658149
+Q20 bases: 322972785(97.3812%)
+Q30 bases: 305951295(92.249%)
+
+Filtering result:
+reads passed filter: 5825132
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 57760
+reads with adapter trimmed: 60292
+bases trimmed due to adapters: 237712
+reads corrected by overlap analysis: 605364
+bases corrected by overlap analysis: 1080253
+
+Duplication rate: 8.45817%
+
+Insert size peak (evaluated by paired-end reads): 103
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_009-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_009-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_009-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_009-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_009-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_009-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_009-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_009-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_009-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_009-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_009-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 99 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 3070463
+total bases: 369724359
+Q20 bases: 356235016(96.3515%)
+Q30 bases: 337516978(91.2888%)
+
+Read2 before filtering:
+total reads: 3070463
+total bases: 370021504
+Q20 bases: 354037776(95.6803%)
+Q30 bases: 331473446(89.5822%)
+
+Read1 after filtering:
+total reads: 3033645
+total bases: 359751965
+Q20 bases: 350258194(97.361%)
+Q30 bases: 333160869(92.6085%)
+
+Read2 aftering filtering:
+total reads: 3033645
+total bases: 359485814
+Q20 bases: 348036798(96.8152%)
+Q30 bases: 327242477(91.0307%)
+
+Filtering result:
+reads passed filter: 6067290
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 73636
+reads with adapter trimmed: 66970
+bases trimmed due to adapters: 291477
+reads corrected by overlap analysis: 765593
+bases corrected by overlap analysis: 1376732
+
+Duplication rate: 10.8482%
+
+Insert size peak (evaluated by paired-end reads): 107
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_012-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_012-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_012-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_012-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_012-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_012-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_012-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_012-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_012-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_012-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_012-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 101 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2709333
+total bases: 315529573
+Q20 bases: 304099704(96.3776%)
+Q30 bases: 288460411(91.421%)
+
+Read2 before filtering:
+total reads: 2709333
+total bases: 315807471
+Q20 bases: 304019137(96.2672%)
+Q30 bases: 286612641(90.7555%)
+
+Read1 after filtering:
+total reads: 2680074
+total bases: 307557240
+Q20 bases: 299567326(97.4021%)
+Q30 bases: 285223362(92.7383%)
+
+Read2 aftering filtering:
+total reads: 2680074
+total bases: 307696581
+Q20 bases: 299412737(97.3078%)
+Q30 bases: 283355734(92.0893%)
+
+Filtering result:
+reads passed filter: 5360148
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 58518
+reads with adapter trimmed: 61726
+bases trimmed due to adapters: 279351
+reads corrected by overlap analysis: 729004
+bases corrected by overlap analysis: 1253647
+
+Duplication rate: 8.29728%
+
+Insert size peak (evaluated by paired-end reads): 106
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_017-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_017-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_017-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_017-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_017-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_017-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_017-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_017-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_017-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_017-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_017-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 101 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2655429
+total bases: 315142825
+Q20 bases: 303775868(96.3931%)
+Q30 bases: 287832396(91.334%)
+
+Read2 before filtering:
+total reads: 2655429
+total bases: 315423038
+Q20 bases: 301851598(95.6974%)
+Q30 bases: 282562662(89.5821%)
+
+Read1 after filtering:
+total reads: 2624167
+total bases: 306674589
+Q20 bases: 298734174(97.4108%)
+Q30 bases: 284164602(92.66%)
+
+Read2 aftering filtering:
+total reads: 2624167
+total bases: 306431403
+Q20 bases: 296808573(96.8597%)
+Q30 bases: 279035171(91.0596%)
+
+Filtering result:
+reads passed filter: 5248334
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 62524
+reads with adapter trimmed: 61050
+bases trimmed due to adapters: 253714
+reads corrected by overlap analysis: 679486
+bases corrected by overlap analysis: 1219783
+
+Duplication rate: 10.3432%
+
+Insert size peak (evaluated by paired-end reads): 102
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_024-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_024-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_024-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_024-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_024-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_024-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_024-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_024-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_024-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_024-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_024-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 102 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2424002
+total bases: 281993917
+Q20 bases: 272029269(96.4664%)
+Q30 bases: 257794457(91.4184%)
+
+Read2 before filtering:
+total reads: 2424002
+total bases: 282196841
+Q20 bases: 270480835(95.8483%)
+Q30 bases: 253613899(89.8713%)
+
+Read1 after filtering:
+total reads: 2397707
+total bases: 274875462
+Q20 bases: 267786982(97.4212%)
+Q30 bases: 254715890(92.6659%)
+
+Read2 aftering filtering:
+total reads: 2397707
+total bases: 274703937
+Q20 bases: 266203852(96.9057%)
+Q30 bases: 250601695(91.2261%)
+
+Filtering result:
+reads passed filter: 4795414
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 52590
+reads with adapter trimmed: 55532
+bases trimmed due to adapters: 206443
+reads corrected by overlap analysis: 544875
+bases corrected by overlap analysis: 972105
+
+Duplication rate: 10.054%
+
+Insert size peak (evaluated by paired-end reads): 95
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_003-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_003-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_003-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_003-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_003-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_003-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 103 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2873997
+total bases: 348566051
+Q20 bases: 335526880(96.2592%)
+Q30 bases: 317561471(91.1051%)
+
+Read2 before filtering:
+total reads: 2873997
+total bases: 348813315
+Q20 bases: 334466617(95.887%)
+Q30 bases: 313732060(89.9427%)
+
+Read1 after filtering:
+total reads: 2841498
+total bases: 339374878
+Q20 bases: 330175935(97.2894%)
+Q30 bases: 313708439(92.4371%)
+
+Read2 aftering filtering:
+total reads: 2841498
+total bases: 339369807
+Q20 bases: 329111735(96.9773%)
+Q30 bases: 309964919(91.3354%)
+
+Filtering result:
+reads passed filter: 5682996
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 64998
+reads with adapter trimmed: 64926
+bases trimmed due to adapters: 305597
+reads corrected by overlap analysis: 828490
+bases corrected by overlap analysis: 1424089
+
+Duplication rate: 10.58%
+
+Insert size peak (evaluated by paired-end reads): 108
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_015-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_015-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_015-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_015-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_015-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_015-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_015-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_015-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_015-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_015-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_015-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 103 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2998023
+total bases: 327935057
+Q20 bases: 316685171(96.5695%)
+Q30 bases: 300696122(91.6938%)
+
+Read2 before filtering:
+total reads: 2998023
+total bases: 328243279
+Q20 bases: 317477032(96.72%)
+Q30 bases: 301057675(91.7178%)
+
+Read1 after filtering:
+total reads: 2970952
+total bases: 320716491
+Q20 bases: 312718173(97.5061%)
+Q30 bases: 297911765(92.8894%)
+
+Read2 aftering filtering:
+total reads: 2970952
+total bases: 321136466
+Q20 bases: 313468084(97.6121%)
+Q30 bases: 298222156(92.8646%)
+
+Filtering result:
+reads passed filter: 5941904
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 54142
+reads with adapter trimmed: 72564
+bases trimmed due to adapters: 257743
+reads corrected by overlap analysis: 723258
+bases corrected by overlap analysis: 1217140
+
+Duplication rate: 6.91209%
+
+Insert size peak (evaluated by paired-end reads): 99
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_022-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_022-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_022-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_022-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_022-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_022-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_022-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_022-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_022-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_022-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_022-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 104 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 3207990
+total bases: 366344938
+Q20 bases: 353885458(96.599%)
+Q30 bases: 336440830(91.8372%)
+
+Read2 before filtering:
+total reads: 3207990
+total bases: 366660283
+Q20 bases: 354319899(96.6344%)
+Q30 bases: 335433166(91.4834%)
+
+Read1 after filtering:
+total reads: 3177440
+total bases: 357999131
+Q20 bases: 349228172(97.55%)
+Q30 bases: 333141593(93.0565%)
+
+Read2 aftering filtering:
+total reads: 3177440
+total bases: 358360146
+Q20 bases: 349635877(97.5655%)
+Q30 bases: 332128537(92.6801%)
+
+Filtering result:
+reads passed filter: 6354880
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 61100
+reads with adapter trimmed: 73476
+bases trimmed due to adapters: 287146
+reads corrected by overlap analysis: 814755
+bases corrected by overlap analysis: 1377116
+
+Duplication rate: 7.26531%
+
+Insert size peak (evaluated by paired-end reads): 104
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_018-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_018-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_018-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_018-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_018-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_018-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_018-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_018-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_018-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_018-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_018-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 104 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2758670
+total bases: 363382764
+Q20 bases: 347515324(95.6334%)
+Q30 bases: 326394243(89.8211%)
+
+Read2 before filtering:
+total reads: 2758670
+total bases: 363713293
+Q20 bases: 343181828(94.355%)
+Q30 bases: 316528030(87.0268%)
+
+Read1 after filtering:
+total reads: 2705740
+total bases: 350488749
+Q20 bases: 339396954(96.8353%)
+Q30 bases: 320330021(91.3952%)
+
+Read2 aftering filtering:
+total reads: 2705740
+total bases: 349287754
+Q20 bases: 335000926(95.9097%)
+Q30 bases: 310757049(88.9688%)
+
+Filtering result:
+reads passed filter: 5411480
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 105860
+reads with adapter trimmed: 77134
+bases trimmed due to adapters: 519510
+reads corrected by overlap analysis: 1078140
+bases corrected by overlap analysis: 1978511
+
+Duplication rate: 12.4446%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_026-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_026-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_026-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_026-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_026-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_026-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_026-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_026-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_026-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_026-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_026-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 106 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2972649
+total bases: 391090661
+Q20 bases: 374256933(95.6957%)
+Q30 bases: 352000996(90.005%)
+
+Read2 before filtering:
+total reads: 2972649
+total bases: 391493206
+Q20 bases: 369357397(94.3458%)
+Q30 bases: 340593166(86.9985%)
+
+Read1 after filtering:
+total reads: 2914384
+total bases: 377153700
+Q20 bases: 365468667(96.9018%)
+Q30 bases: 345424763(91.5873%)
+
+Read2 aftering filtering:
+total reads: 2914384
+total bases: 375840778
+Q20 bases: 360515278(95.9223%)
+Q30 bases: 334370501(88.966%)
+
+Filtering result:
+reads passed filter: 5828768
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 116530
+reads with adapter trimmed: 80442
+bases trimmed due to adapters: 551782
+reads corrected by overlap analysis: 1182824
+bases corrected by overlap analysis: 2181464
+
+Duplication rate: 11.6539%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_027-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_027-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_027-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_027-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_027-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_027-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_027-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_027-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_027-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_027-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_027-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 105 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 3278394
+total bases: 418399754
+Q20 bases: 402253222(96.1409%)
+Q30 bases: 380590759(90.9634%)
+
+Read2 before filtering:
+total reads: 3278394
+total bases: 418678835
+Q20 bases: 398946335(95.287%)
+Q30 bases: 371021706(88.6173%)
+
+Read1 after filtering:
+total reads: 3238687
+total bases: 406397266
+Q20 bases: 395151206(97.2327%)
+Q30 bases: 375446877(92.3842%)
+
+Read2 aftering filtering:
+total reads: 3238687
+total bases: 405978630
+Q20 bases: 391692974(96.4812%)
+Q30 bases: 365929782(90.1352%)
+
+Filtering result:
+reads passed filter: 6477374
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 79414
+reads with adapter trimmed: 61176
+bases trimmed due to adapters: 306026
+reads corrected by overlap analysis: 969869
+bases corrected by overlap analysis: 1696679
+
+Duplication rate: 14.993%
+
+Insert size peak (evaluated by paired-end reads): 117
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_016-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_016-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_016-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_016-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_016-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_016-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_016-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_016-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_016-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_016-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_016-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 106 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2893141
+total bases: 377655665
+Q20 bases: 362095861(95.8799%)
+Q30 bases: 341246068(90.359%)
+
+Read2 before filtering:
+total reads: 2893141
+total bases: 377982418
+Q20 bases: 358458058(94.8346%)
+Q30 bases: 332426026(87.9475%)
+
+Read1 after filtering:
+total reads: 2844378
+total bases: 365121134
+Q20 bases: 354414895(97.0678%)
+Q30 bases: 335557121(91.903%)
+
+Read2 aftering filtering:
+total reads: 2844378
+total bases: 363995538
+Q20 bases: 350626944(96.3273%)
+Q30 bases: 326945123(89.8212%)
+
+Filtering result:
+reads passed filter: 5688756
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 97526
+reads with adapter trimmed: 75070
+bases trimmed due to adapters: 539213
+reads corrected by overlap analysis: 1052187
+bases corrected by overlap analysis: 1941370
+
+Duplication rate: 10.2158%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_028-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_028-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_028-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_028-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_028-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_028-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_028-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_028-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_028-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_028-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_028-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 68 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 6315977
+total bases: 901499284
+Q20 bases: 860862248(95.4923%)
+Q30 bases: 809847664(89.8334%)
+
+Read2 before filtering:
+total reads: 6315977
+total bases: 902007727
+Q20 bases: 843843694(93.5517%)
+Q30 bases: 764367161(84.7406%)
+
+Read1 after filtering:
+total reads: 6228769
+total bases: 866764272
+Q20 bases: 839994643(96.9115%)
+Q30 bases: 794828648(91.7007%)
+
+Read2 aftering filtering:
+total reads: 6228769
+total bases: 864706447
+Q20 bases: 822626471(95.1336%)
+Q30 bases: 749802517(86.7118%)
+
+Filtering result:
+reads passed filter: 12457538
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 174416
+reads with adapter trimmed: 43438
+bases trimmed due to adapters: 287530
+reads corrected by overlap analysis: 1739343
+bases corrected by overlap analysis: 3186429
+
+Duplication rate: 22.853%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_008-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_008-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_008-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_008-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_008-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_008-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_008-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_008-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_008-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_008-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_008-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 116 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2538346
+total bases: 331453070
+Q20 bases: 317610635(95.8237%)
+Q30 bases: 299184125(90.2644%)
+
+Read2 before filtering:
+total reads: 2538346
+total bases: 331745719
+Q20 bases: 313572883(94.5221%)
+Q30 bases: 289604699(87.2972%)
+
+Read1 after filtering:
+total reads: 2490890
+total bases: 320132746
+Q20 bases: 310462246(96.9792%)
+Q30 bases: 293830899(91.7841%)
+
+Read2 aftering filtering:
+total reads: 2490890
+total bases: 319096185
+Q20 bases: 306375889(96.0136%)
+Q30 bases: 284518313(89.1638%)
+
+Filtering result:
+reads passed filter: 4981780
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 94912
+reads with adapter trimmed: 67222
+bases trimmed due to adapters: 448974
+reads corrected by overlap analysis: 945533
+bases corrected by overlap analysis: 1726077
+
+Duplication rate: 12.8721%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_029-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_029-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_029-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_029-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_029-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_029-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_029-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_029-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_029-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_029-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_029-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 52 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2397742
+total bases: 317576802
+Q20 bases: 304042860(95.7384%)
+Q30 bases: 286163366(90.1084%)
+
+Read2 before filtering:
+total reads: 2397742
+total bases: 317853696
+Q20 bases: 300056616(94.4009%)
+Q30 bases: 276882196(87.11%)
+
+Read1 after filtering:
+total reads: 2355232
+total bases: 306558242
+Q20 bases: 297194627(96.9456%)
+Q30 bases: 281080462(91.6891%)
+
+Read2 aftering filtering:
+total reads: 2355232
+total bases: 305623815
+Q20 bases: 293183318(95.9295%)
+Q30 bases: 272063536(89.0191%)
+
+Filtering result:
+reads passed filter: 4710464
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 85020
+reads with adapter trimmed: 58792
+bases trimmed due to adapters: 440079
+reads corrected by overlap analysis: 908666
+bases corrected by overlap analysis: 1675869
+
+Duplication rate: 15.284%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_030-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_030-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_030-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_030-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_030-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_030-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_030-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_030-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_030-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_030-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_030-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 44 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2578951
+total bases: 330618771
+Q20 bases: 316123270(95.6156%)
+Q30 bases: 297013196(89.8356%)
+
+Read2 before filtering:
+total reads: 2578951
+total bases: 330984625
+Q20 bases: 312727388(94.484%)
+Q30 bases: 289062077(87.334%)
+
+Read1 after filtering:
+total reads: 2531015
+total bases: 319105219
+Q20 bases: 308986266(96.829%)
+Q30 bases: 291719930(91.4181%)
+
+Read2 aftering filtering:
+total reads: 2531015
+total bases: 318130503
+Q20 bases: 305455589(96.0158%)
+Q30 bases: 283940166(89.2527%)
+
+Filtering result:
+reads passed filter: 5062030
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 95872
+reads with adapter trimmed: 75208
+bases trimmed due to adapters: 469481
+reads corrected by overlap analysis: 973559
+bases corrected by overlap analysis: 1783595
+
+Duplication rate: 12.2075%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_031-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_031-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_031-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_031-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_031-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_031-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_031-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_031-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_031-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_031-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_031-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 61 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2069154
+total bases: 258831264
+Q20 bases: 247353163(95.5654%)
+Q30 bases: 232432229(89.8007%)
+
+Read2 before filtering:
+total reads: 2069154
+total bases: 259056583
+Q20 bases: 247277645(95.4531%)
+Q30 bases: 231165591(89.2336%)
+
+Read1 after filtering:
+total reads: 2035276
+total bases: 250308112
+Q20 bases: 242299184(96.8004%)
+Q30 bases: 228754751(91.3893%)
+
+Read2 aftering filtering:
+total reads: 2035276
+total bases: 250448372
+Q20 bases: 242299732(96.7464%)
+Q30 bases: 227607505(90.88%)
+
+Filtering result:
+reads passed filter: 4070552
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 67756
+reads with adapter trimmed: 68766
+bases trimmed due to adapters: 392132
+reads corrected by overlap analysis: 697900
+bases corrected by overlap analysis: 1292915
+
+Duplication rate: 8.43224%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_034-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_034-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_034-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_034-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_034-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_034-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_034-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_034-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_034-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_034-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_034-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 55 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2266015
+total bases: 293510564
+Q20 bases: 280716416(95.641%)
+Q30 bases: 264029699(89.9558%)
+
+Read2 before filtering:
+total reads: 2266015
+total bases: 293796669
+Q20 bases: 279743046(95.2165%)
+Q30 bases: 260534859(88.6786%)
+
+Read1 after filtering:
+total reads: 2231636
+total bases: 283915423
+Q20 bases: 275056094(96.8796%)
+Q30 bases: 259936361(91.5542%)
+
+Read2 aftering filtering:
+total reads: 2231636
+total bases: 283931620
+Q20 bases: 274114292(96.5424%)
+Q30 bases: 256554645(90.3579%)
+
+Filtering result:
+reads passed filter: 4463272
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 68758
+reads with adapter trimmed: 61124
+bases trimmed due to adapters: 390343
+reads corrected by overlap analysis: 752220
+bases corrected by overlap analysis: 1383638
+
+Duplication rate: 13.5577%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_039-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_039-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_039-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_039-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_039-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_039-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_039-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_039-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_039-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_039-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_039-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 57 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2387826
+total bases: 308494275
+Q20 bases: 294372920(95.4225%)
+Q30 bases: 276361196(89.5839%)
+
+Read2 before filtering:
+total reads: 2387826
+total bases: 308753153
+Q20 bases: 294911361(95.5169%)
+Q30 bases: 275885717(89.3548%)
+
+Read1 after filtering:
+total reads: 2348458
+total bases: 297680531
+Q20 bases: 288002561(96.7489%)
+Q30 bases: 271743595(91.287%)
+
+Read2 aftering filtering:
+total reads: 2348458
+total bases: 298292761
+Q20 bases: 288802615(96.8185%)
+Q30 bases: 271499080(91.0177%)
+
+Filtering result:
+reads passed filter: 4696916
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 78736
+reads with adapter trimmed: 73080
+bases trimmed due to adapters: 495066
+reads corrected by overlap analysis: 824611
+bases corrected by overlap analysis: 1529087
+
+Duplication rate: 9.83975%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_042-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_042-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_042-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_042-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_042-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_042-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_042-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_042-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_042-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_042-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_042-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 58 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2446803
+total bases: 317530694
+Q20 bases: 303155459(95.4728%)
+Q30 bases: 284938024(89.7356%)
+
+Read2 before filtering:
+total reads: 2446803
+total bases: 317886063
+Q20 bases: 302638684(95.2035%)
+Q30 bases: 282107488(88.7448%)
+
+Read1 after filtering:
+total reads: 2407034
+total bases: 306341367
+Q20 bases: 296598114(96.8195%)
+Q30 bases: 280191682(91.4639%)
+
+Read2 aftering filtering:
+total reads: 2407034
+total bases: 306524585
+Q20 bases: 296165994(96.6206%)
+Q30 bases: 277524121(90.5389%)
+
+Filtering result:
+reads passed filter: 4814068
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 79538
+reads with adapter trimmed: 70416
+bases trimmed due to adapters: 457108
+reads corrected by overlap analysis: 872576
+bases corrected by overlap analysis: 1638743
+
+Duplication rate: 12.1558%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_032-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_032-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_032-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_032-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_032-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_032-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_032-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_032-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_032-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_032-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_032-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 64 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2803901
+total bases: 360770277
+Q20 bases: 345249823(95.698%)
+Q30 bases: 325107576(90.1148%)
+
+Read2 before filtering:
+total reads: 2803901
+total bases: 361057624
+Q20 bases: 344531520(95.4229%)
+Q30 bases: 321829030(89.1351%)
+
+Read1 after filtering:
+total reads: 2761519
+total bases: 349160304
+Q20 bases: 338398557(96.9178%)
+Q30 bases: 320143029(91.6894%)
+
+Read2 aftering filtering:
+total reads: 2761519
+total bases: 349356398
+Q20 bases: 337817145(96.697%)
+Q30 bases: 317053052(90.7535%)
+
+Filtering result:
+reads passed filter: 5523038
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 84764
+reads with adapter trimmed: 76778
+bases trimmed due to adapters: 479843
+reads corrected by overlap analysis: 927502
+bases corrected by overlap analysis: 1718213
+
+Duplication rate: 12.378%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_038-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_038-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_038-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_038-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_038-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_038-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_038-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_038-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_038-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_038-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_038-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 74 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2468298
+total bases: 320241531
+Q20 bases: 305378033(95.3587%)
+Q30 bases: 286376266(89.4251%)
+
+Read2 before filtering:
+total reads: 2468298
+total bases: 320573602
+Q20 bases: 304852083(95.0958%)
+Q30 bases: 283919212(88.566%)
+
+Read1 after filtering:
+total reads: 2427489
+total bases: 308943879
+Q20 bases: 298748144(96.6998%)
+Q30 bases: 281595629(91.1478%)
+
+Read2 aftering filtering:
+total reads: 2427489
+total bases: 309052967
+Q20 bases: 298289137(96.5172%)
+Q30 bases: 279272473(90.364%)
+
+Filtering result:
+reads passed filter: 4854978
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 81618
+reads with adapter trimmed: 77960
+bases trimmed due to adapters: 504346
+reads corrected by overlap analysis: 903398
+bases corrected by overlap analysis: 1685436
+
+Duplication rate: 11.7789%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_033-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_033-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_033-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_033-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_033-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_033-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_033-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_033-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_033-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_033-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_033-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 76 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2835971
+total bases: 375366578
+Q20 bases: 360007413(95.9082%)
+Q30 bases: 339468241(90.4365%)
+
+Read2 before filtering:
+total reads: 2835971
+total bases: 375630559
+Q20 bases: 359203849(95.6269%)
+Q30 bases: 335775790(89.3899%)
+
+Read1 after filtering:
+total reads: 2794767
+total bases: 363969810
+Q20 bases: 353210250(97.0438%)
+Q30 bases: 334516120(91.9077%)
+
+Read2 aftering filtering:
+total reads: 2794767
+total bases: 363946745
+Q20 bases: 352460868(96.8441%)
+Q30 bases: 330977319(90.9411%)
+
+Filtering result:
+reads passed filter: 5589534
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 82408
+reads with adapter trimmed: 71598
+bases trimmed due to adapters: 537053
+reads corrected by overlap analysis: 919010
+bases corrected by overlap analysis: 1684338
+
+Duplication rate: 10.6613%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_036-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_036-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_036-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_036-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_036-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_036-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_036-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_036-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_036-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_036-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_036-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 76 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2581499
+total bases: 319809727
+Q20 bases: 305322907(95.4702%)
+Q30 bases: 287102515(89.7729%)
+
+Read2 before filtering:
+total reads: 2581499
+total bases: 320098014
+Q20 bases: 306487218(95.7479%)
+Q30 bases: 287974492(89.9645%)
+
+Read1 after filtering:
+total reads: 2541469
+total bases: 308701257
+Q20 bases: 298945886(96.8399%)
+Q30 bases: 282537369(91.5245%)
+
+Read2 aftering filtering:
+total reads: 2541469
+total bases: 309635773
+Q20 bases: 300425128(97.0253%)
+Q30 bases: 283626723(91.6001%)
+
+Filtering result:
+reads passed filter: 5082938
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 80060
+reads with adapter trimmed: 79724
+bases trimmed due to adapters: 491591
+reads corrected by overlap analysis: 837550
+bases corrected by overlap analysis: 1580075
+
+Duplication rate: 8.4208%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_047-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_047-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_047-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_047-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_047-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_047-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_047-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_047-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_047-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_047-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_047-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 71 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 3452794
+total bases: 446892496
+Q20 bases: 427429000(95.6447%)
+Q30 bases: 402542057(90.0758%)
+
+Read2 before filtering:
+total reads: 3452794
+total bases: 447319382
+Q20 bases: 426812424(95.4156%)
+Q30 bases: 398751777(89.1425%)
+
+Read1 after filtering:
+total reads: 3398179
+total bases: 431774335
+Q20 bases: 418545314(96.9361%)
+Q30 bases: 396086534(91.7346%)
+
+Read2 aftering filtering:
+total reads: 3398179
+total bases: 432110815
+Q20 bases: 418131924(96.765%)
+Q30 bases: 392590230(90.8541%)
+
+Filtering result:
+reads passed filter: 6796358
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 109230
+reads with adapter trimmed: 97704
+bases trimmed due to adapters: 636015
+reads corrected by overlap analysis: 1198944
+bases corrected by overlap analysis: 2229796
+
+Duplication rate: 9.30177%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_037-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_037-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_037-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_037-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_037-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_037-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_037-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_037-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_037-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_037-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_037-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 85 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2751038
+total bases: 356713042
+Q20 bases: 340035318(95.3246%)
+Q30 bases: 319040810(89.4391%)
+
+Read2 before filtering:
+total reads: 2751038
+total bases: 357028576
+Q20 bases: 340644566(95.411%)
+Q30 bases: 318179922(89.1189%)
+
+Read1 after filtering:
+total reads: 2704783
+total bases: 344040303
+Q20 bases: 332598181(96.6742%)
+Q30 bases: 313666231(91.1714%)
+
+Read2 aftering filtering:
+total reads: 2704783
+total bases: 344639870
+Q20 bases: 333394032(96.7369%)
+Q30 bases: 312977063(90.8128%)
+
+Filtering result:
+reads passed filter: 5409566
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 92510
+reads with adapter trimmed: 86268
+bases trimmed due to adapters: 618828
+reads corrected by overlap analysis: 968304
+bases corrected by overlap analysis: 1793700
+
+Duplication rate: 11.846%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_040-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_040-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_040-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_040-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_040-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_040-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_040-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_040-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_040-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_040-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_040-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 85 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2958235
+total bases: 399325198
+Q20 bases: 381612747(95.5644%)
+Q30 bases: 358951585(89.8895%)
+
+Read2 before filtering:
+total reads: 2958235
+total bases: 399657929
+Q20 bases: 378666112(94.7476%)
+Q30 bases: 350311428(87.6528%)
+
+Read1 after filtering:
+total reads: 2910814
+total bases: 385274112
+Q20 bases: 373169201(96.8581%)
+Q30 bases: 352779209(91.5658%)
+
+Read2 aftering filtering:
+total reads: 2910814
+total bases: 384918947
+Q20 bases: 370242114(96.187%)
+Q30 bases: 344370046(89.4656%)
+
+Filtering result:
+reads passed filter: 5821628
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 94842
+reads with adapter trimmed: 66822
+bases trimmed due to adapters: 511757
+reads corrected by overlap analysis: 1018752
+bases corrected by overlap analysis: 1904048
+
+Duplication rate: 17.9046%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_035-Ex1-b-cssl2.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_035-Ex1-b-cssl2.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_035-Ex1-b-cssl2.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_035-Ex1-b-cssl2.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_035-Ex1-b-cssl2.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_035-Ex1-b-cssl2.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_035-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_035-Ex1-b-cssl2.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_035-Ex1-b-cssl2.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_035-Ex1-b-cssl2.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_035-Ex1-b-cssl2.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 89 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2588677
+total bases: 345223722
+Q20 bases: 329795715(95.531%)
+Q30 bases: 310135799(89.8362%)
+
+Read2 before filtering:
+total reads: 2588677
+total bases: 345492681
+Q20 bases: 329071842(95.2471%)
+Q30 bases: 306523671(88.7207%)
+
+Read1 after filtering:
+total reads: 2547766
+total bases: 333256483
+Q20 bases: 322724233(96.8396%)
+Q30 bases: 305014412(91.5254%)
+
+Read2 aftering filtering:
+total reads: 2547766
+total bases: 333521847
+Q20 bases: 322171489(96.5968%)
+Q30 bases: 301621296(90.4352%)
+
+Filtering result:
+reads passed filter: 5095532
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 81822
+reads with adapter trimmed: 65618
+bases trimmed due to adapters: 515275
+reads corrected by overlap analysis: 894669
+bases corrected by overlap analysis: 1667827
+
+Duplication rate: 14.3412%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_043-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_043-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_043-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_043-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_043-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_043-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_043-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_043-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_043-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_043-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_043-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 83 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 3248269
+total bases: 432401147
+Q20 bases: 411182063(95.0927%)
+Q30 bases: 384826419(88.9975%)
+
+Read2 before filtering:
+total reads: 3248269
+total bases: 432812801
+Q20 bases: 411390204(95.0504%)
+Q30 bases: 383101682(88.5144%)
+
+Read1 after filtering:
+total reads: 3192924
+total bases: 415859881
+Q20 bases: 401536249(96.5557%)
+Q30 bases: 377892033(90.87%)
+
+Read2 aftering filtering:
+total reads: 3192924
+total bases: 416514151
+Q20 bases: 401997214(96.5147%)
+Q30 bases: 376415518(90.3728%)
+
+Filtering result:
+reads passed filter: 6385848
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 110690
+reads with adapter trimmed: 95408
+bases trimmed due to adapters: 673663
+reads corrected by overlap analysis: 1226402
+bases corrected by overlap analysis: 2304653
+
+Duplication rate: 14.0048%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_041-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_041-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_041-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_041-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_041-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_041-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_041-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_041-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_041-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_041-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_041-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 85 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 2761968
+total bases: 357783868
+Q20 bases: 341113985(95.3408%)
+Q30 bases: 320123521(89.474%)
+
+Read2 before filtering:
+total reads: 2761968
+total bases: 358103741
+Q20 bases: 341035944(95.2338%)
+Q30 bases: 318024465(88.8079%)
+
+Read1 after filtering:
+total reads: 2715996
+total bases: 344883316
+Q20 bases: 333530370(96.7082%)
+Q30 bases: 314651713(91.2343%)
+
+Read2 aftering filtering:
+total reads: 2715996
+total bases: 345441215
+Q20 bases: 333656116(96.5884%)
+Q30 bases: 312734213(90.5318%)
+
+Filtering result:
+reads passed filter: 5431992
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 91944
+reads with adapter trimmed: 78096
+bases trimmed due to adapters: 531117
+reads corrected by overlap analysis: 936706
+bases corrected by overlap analysis: 1749935
+
+Duplication rate: 14.2973%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_048-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_048-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_048-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_048-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_048-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_048-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_048-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_048-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_048-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_048-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_048-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 79 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 3403147
+total bases: 445279582
+Q20 bases: 425867218(95.6404%)
+Q30 bases: 401024308(90.0612%)
+
+Read2 before filtering:
+total reads: 3403147
+total bases: 445590206
+Q20 bases: 425790349(95.5565%)
+Q30 bases: 398264029(89.379%)
+
+Read1 after filtering:
+total reads: 3350754
+total bases: 430498995
+Q20 bases: 417172058(96.9043%)
+Q30 bases: 394724814(91.6901%)
+
+Read2 aftering filtering:
+total reads: 3350754
+total bases: 430987585
+Q20 bases: 417347643(96.8352%)
+Q30 bases: 392231552(91.0076%)
+
+Filtering result:
+reads passed filter: 6701508
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 104786
+reads with adapter trimmed: 91738
+bases trimmed due to adapters: 660719
+reads corrected by overlap analysis: 1166637
+bases corrected by overlap analysis: 2165118
+
+Duplication rate: 11.6891%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_046-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_046-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_046-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_046-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_046-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_046-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_046-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_046-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_046-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_046-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_046-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 83 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 4102190
+total bases: 541448832
+Q20 bases: 515803657(95.2636%)
+Q30 bases: 482850690(89.1775%)
+
+Read2 before filtering:
+total reads: 4102190
+total bases: 542078331
+Q20 bases: 509985158(94.0796%)
+Q30 bases: 469731901(86.6539%)
+
+Read1 after filtering:
+total reads: 4023443
+total bases: 520583915
+Q20 bases: 503061584(96.6341%)
+Q30 bases: 473492355(90.9541%)
+
+Read2 aftering filtering:
+total reads: 4023443
+total bases: 518977896
+Q20 bases: 497012226(95.7675%)
+Q30 bases: 460656327(88.7622%)
+
+Filtering result:
+reads passed filter: 8046886
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 157494
+reads with adapter trimmed: 116112
+bases trimmed due to adapters: 958833
+reads corrected by overlap analysis: 1689184
+bases corrected by overlap analysis: 3164942
+
+Duplication rate: 14.8541%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_050-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_050-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_050-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_050-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_050-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_050-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_050-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_050-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_050-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_050-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_050-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 74 seconds
+Detecting adapter sequence for read1...
+No adapter detected for read1
+
+Detecting adapter sequence for read2...
+No adapter detected for read2
+
+Read1 before filtering:
+total reads: 3799162
+total bases: 502006753
+Q20 bases: 478529265(95.3233%)
+Q30 bases: 448456359(89.3327%)
+
+Read2 before filtering:
+total reads: 3799162
+total bases: 502506567
+Q20 bases: 473714069(94.2702%)
+Q30 bases: 437020000(86.968%)
+
+Read1 after filtering:
+total reads: 3725724
+total bases: 482742630
+Q20 bases: 466690299(96.6748%)
+Q30 bases: 439713751(91.0866%)
+
+Read2 aftering filtering:
+total reads: 3725724
+total bases: 481541984
+Q20 bases: 461791810(95.8986%)
+Q30 bases: 428620451(89.01%)
+
+Filtering result:
+reads passed filter: 7451448
+reads failed due to low quality: 0
+reads failed due to too many N: 0
+reads failed due to too short: 146876
+reads with adapter trimmed: 108240
+bases trimmed due to adapters: 791352
+reads corrected by overlap analysis: 1494318
+bases corrected by overlap analysis: 2773342
+
+Duplication rate: 15.2082%
+
+Insert size peak (evaluated by paired-end reads): 150
+
+JSON report: fq_fp1_clmp_fp2/Gmi-ABas_051-Ex1-b-cssl.clmp.r1r2_fastp.json
+HTML report: fq_fp1_clmp_fp2/Gmi-ABas_051-Ex1-b-cssl.clmp.r1r2_fastp.html
+
+fastp --in1 fq_fp1_clmp/Gmi-ABas_051-Ex1-b-cssl.clmp.r1.fq.gz --in2 fq_fp1_clmp/Gmi-ABas_051-Ex1-b-cssl.clmp.r2.fq.gz --out1 fq_fp1_clmp_fp2/Gmi-ABas_051-Ex1-b-cssl.clmp.fp2_r1.fq.gz --out2 fq_fp1_clmp_fp2/Gmi-ABas_051-Ex1-b-cssl.clmp.fp2_r2.fq.gz --unpaired1 fq_fp1_clmp_fp2/failed/Gmi-ABas_051-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --unpaired2 fq_fp1_clmp_fp2/failed/Gmi-ABas_051-Ex1-b-cssl.clmp.fp2_unprd.fq.gz --failed_out fq_fp1_clmp_fp2/failed/Gmi-ABas_051-Ex1-b-cssl.clmp.fp2_fail.fq.gz -h fq_fp1_clmp_fp2/Gmi-ABas_051-Ex1-b-cssl.clmp.r1r2_fastp.html -j fq_fp1_clmp_fp2/Gmi-ABas_051-Ex1-b-cssl.clmp.r1r2_fastp.json --detect_adapter_for_pe --trim_front1 0 --trim_front2 0 --length_required 33 --cut_front --cut_front_window_size 1 --cut_front_mean_quality 20 --cut_right --cut_right_window_size 10 --cut_right_mean_quality 20 --disable_trim_poly_g --correction --disable_quality_filtering --unqualified_percent_limit 40 --report_title Second Trim R1R2 
+fastp v0.20.1, time used: 72 seconds
+slurmstepd: error: *** JOB 1164005 ON e1-w6420b-03 CANCELLED AT 2022-11-17T15:55:39 ***
