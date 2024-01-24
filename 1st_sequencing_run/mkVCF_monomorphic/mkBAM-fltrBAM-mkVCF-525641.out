@@ -1,0 +1,563 @@
+
+
+* dDocentHPC v4.5 Forked by cbird@tamucc.edu * 
+
+
+Running dDocentHPC mkVCF...
+ 
+Mon Nov 29 10:59:46 EST 2021 Files output to:  /home/r3clark/PIRE/pire_cssl_data_processing/gazza_minuta/mkVCF_monomorphic
+
+Mon Nov 29 10:59:46 EST 2021 Reading config file... 
+ 
+Settings for dDocentHPC
+#Made in notepad++, use for best viewing
+
+These default settings assume ddRAD, no overlapping 151 bp reads
+
+40              Number of Processors (Auto, 1, 2, 3, ..., n threads) cbirdq=40 normal=20
+230G    Maximum Memory (1G,2G,..., 256G)  G=gigabytes
+
+----------trimFQ: Settings for Trimming FASTQ Files---------------------------------------------------------------
+146             trimmomatic MINLEN (integer, mkREF only)                                                Drop the read if it is below a specified length. Set to the length of the Read1 reads.
+75              trimmomatic MINLEN (integer, mkBAM only)                                                Drop the read if it is below a specified length. Set to the minimum frag length you want mapped to the reference.
+20              trimmomatic LEADING:<quality> (integer, mkBAM only)                             Specifies the minimum quality required to keep a base.
+15              trimmomatic TRAILING:<quality> (integer, mkREF only)                    Specifies the minimum quality required to keep a base.
+20              trimmomatic TRAILING:<quality> (integer, mkBAM only)                    Specifies the minimum quality required to keep a base.
+TruSeq3-PE-2.fa trimmomatic ILLUMINACLIP:<fasta> (0, fasta file name)                   Specifies the trimmomatic adapter file to use. entering a 0 (zero) will turn off adapter trimming. Options are: TruSeq3-PE-2.fa, TruSeq3-PE.fa, TruSeq3-SE.fa, TruSeq2-PE.fa, TruSeq2-SE.fa, any other files included with trimmomatic.  Entering a custom path here will break the script. If you want a customized file, you have to put it where the default trimmomatic files are located on your computer.  If you have trouble finding this location, run dDocentHPC trimREF and it will be included in the output.
+2               trimmomatic ILLUMINACLIP:<seed mismatches> (integer)                    specifies the maximum mismatch count which will still allow a full match to be performed
+30              trimmomatic ILLUMINACLIP:<palindrome clip thresh> (integer)             specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment
+10              trimmomatic ILLUMINACLIP:<simple clip thresh> (integer)                 specifies how accurate the match between any adapter etc. sequence must be against a read.
+20              trimmomatic SLIDINGWINDOW:<windowSize> (integer)                                specifies the number of bases to average across
+20              trimmomatic SLIDINGWINDOW:<windowQuality> (integer)                             specifies the average quality required.
+0               trimmomatic CROP:<bp to keep> (integer, mkBAM only)    Trim read sequences down to this length. Enter 0 for no cropping
+0               trimmomatic HEADCROP:<length> (integer, only Read1 for ezRAD)   The number of bases to remove from the start of the read. 0 for ddRAD, 5 for ezRAD
+no              FixStacks (yes,no)                                                                                      Demultiplexing with stacks introduces anomolies.  This removes them.
+------------------------------------------------------------------------------------------------------------------
+
+----------mkREF: Settings for de novo assembly of the reference genome--------------------------------------------
+PE              Type of reads for assembly (PE, SE, OL, RPE)                                    PE=ddRAD & ezRAD pairedend, non-overlapping reads; SE=singleend reads; OL=ddRAD & ezRAD overlapping reads, miseq; RPE=oregonRAD, restriction site + random shear
+0.9             cdhit Clustering_Similarity_Pct (0-1)                                                   Use cdhit to cluster and collapse uniq reads by similarity threshold
+rad               Cutoff1 (integer)                                                                                         Use unique reads that have at least this much coverage for making the reference     genome
+RAW-10-10               Cutoff2 (integer)
+                Use unique reads that occur in at least this many individuals for making the reference genome
+0.05    rainbow merge -r <percentile> (decimal 0-1)                                             Percentile-based minimum number of seqs to assemble in a precluster
+0.95    rainbow merge -R <percentile> (decimal 0-1)                                             Percentile-based maximum number of seqs to assemble in a precluster
+------------------------------------------------------------------------------------------------------------------
+
+----------mkBAM: Settings for mapping the reads to the reference genome-------------------------------------------
+Make sure the cutoffs above match the reference*fasta!
+1               bwa mem -A Mapping_Match_Value (integer)
+4               bwa mem -B Mapping_MisMatch_Value (integer)
+6               bwa mem -O Mapping_GapOpen_Penalty (integer)
+30              bwa mem -T Mapping_Minimum_Alignment_Score (integer)                    Remove reads that have an alignment score less than this.
+5       bwa mem -L Mapping_Clipping_Penalty (integer,integer)
+------------------------------------------------------------------------------------------------------------------
+
+----------fltrBAM: Settings for filtering mapping alignments in the *bam files---------------
+20              samtools view -q        Mapping_Min_Quality (integer)                   Remove reads with mapping qual less than this value
+yes             samtools view -F 4      Remove_unmapped_reads? (yes,no)                 Since the reads aren't mapped, we generally don't need to filter them
+no              samtools view -F 8      Remove_read_pair_if_one_is_unmapped? (yes,no)   If either read in a pair does not map, then the other is also removed
+yes             samtools view -F 256    Remove_secondary_alignments? (yes,no)           Secondary alignments are reads that also map to other contigs in the reference genome
+no              samtools view -F 512    Remove_reads_not_passing_platform_vendor_filters (yes,no)               We generally don't see any of these
+no              samtools view -F 1024   Remove_PCR_or_optical_duplicates? (yes,no)      You probably don't want to set this to yes
+no              samtools view -F 2048   Remove_supplementary_alignments? (yes,no)       We generally don't see any of these
+no              samtools view -f 2      Keep_only_properly_aligned_read_pairs? (yes,no)                         Set to no if OL mode
+0               samtools view -F        Custom_samtools_view_F_bit_value? (integer)                             performed separately from the above, consult samtools man
+0               samtools view -f        Custom_samtools_view_f_bit_value? (integer)                             performed separately from the above, consult samtools man
+30                                      Remove_reads_with_excessive_soft_clipping? (no, integers by 10s)        minimum number of soft clipped bases in a read that is unacceptable
+30                                      Remove_reads_with_alignment_score_below (integer)               Should match bwa mem -T, which sometimes doesn't work
+no                                      Remove_reads_orphaned_by_filters? (yes,no)
+------------------------------------------------------------------------------------------------------------------
+
+----------mkVCF: Settings for variant calling/ genotyping---------------------------------------------------------
+no      freebayes -J --pooled-discrete (yes|no)                         If yes, a pool of individuals is assumed to be the statistical unit of observation.
+no      freebayes -A --cnv-map (filename.bed or no)                     If the pools have different numbers of individuals, then you should provide a copy number variation (cnv) *.bed file with the "ploidy" of each pool. the bed file should be in the working directory and formatted as follows: popmap_column_1 ploidy_of_pool.  If that doesn't work, try the basenames of the files in popmap column 1.
+2       freebayes -p --ploidy (integer)                                 Whether pooled or not, if no cnv-map file is provided, then what is the ploidy of the samples? for pools, this number should be the number of individuals * ploidy
+no      freebayes -r --region (filename.bed or no)                      Limit analysis to specified region.  Bed file format: <chrom>:<start_position>-<end_position>
+0       only genotype read 1 (integer)                                  Limit analysis to only Read 1 positions, integer is maximum Read1 bp position
+0       Minimum Mean Depth of Coverage Per Individual                   Limit analysis to contigs with at least the specified mean depth of coverage per individual
+0       freebayes -n --use-best-n-alleles (integer)                     reduce the number of alleles considered to n, zero means all, set to 2 or more if you run out of memory
+30      freebayes -m --min-mapping-quality (integer)
+20      freebayes -q --min-base-quality (integer)
+-1      freebayes -E --haplotype-length (-1, 3, or integer)             Set to -1 to avoid multi nucleotide polymorphisms and force calling MNPs as SNPs.  Can be set up to half the read length, or more.
+0       freebayes    --min-repeat-entropy (0, 1, or integer)            Set to 0 to avoid multi nucleotide polymorphisms and force calling MNPs as SNPs. To detect interrupted repeats, build across sequence until it has entropy > N bits per bp.
+10      freebayes    --min-coverage (integer)                           Require at least this coverage to process a site
+0.375   freebayes -F --min-alternate-fraction (decimal 0-1)             There must be at least 1 individual with this fraction of alt reads to evaluate the position. If your individuals are barcoded, then use 0.2. If your data is pooled, then set based upon ~ 1/(numIndivids * ploidy) and average depth of coverage
+2       freebayes -C --min-alternate-count (integer)                    Require at least this count of observations supporting an alternate allele within a single individual in order to evaluate the position.  default: 2
+10      freebayes -G --min-alternate-total (integer)                    Require at least this count of observations supporting an alternate allele within the total population in order to use the allele in analysis.  default: 1
+0.33    freebayes -z --read-max-mismatch-fraction (decimal 0-1)         Exclude reads with more than N [0,1] fraction of mismatches where each mismatch has base quality >= mismatch-base-quality-threshold default: 1.0
+20      freebayes -Q --mismatch-base-quality-threshold (integer)        Count mismatches toward --read-mismatch-limit if the base quality of the mismatch is >= Q.  default: 10
+50      freebayes -U --read-mismatch-limit (integer)                    Exclude reads with more than N mismatches where each mismatch has base quality >= mismatch-base-quality-threshold. default: ~unbounded
+20      freebayes ~3 ~~min-alternate-qsum (integer)                     This value is the mean base quality score for alternate reads and will be multiplied by -C to set -3. Description of -3: Require at least this count of observations supporting an alternate allele within a single individual in order to evaluate the position.  default: 2
+50      freebayes -$ --read-snp-limit (integer)                         Exclude reads with more than N base mismatches, ignoring gaps with quality >= mismatch-base-quality-threshold. default: ~unbounded
+20      freebayes -e --read-indel-limit (integer)                       Exclude reads with more than N separate gaps. default: ~unbounded
+no      freebayes -w --hwe-priors-off (no|yes)                          Disable estimation of the probability of the combination arising under HWE given the allele frequency as estimated by observation frequency.
+no      freebayes -V --binomial-obs-priors-off (no|yes)                 Disable incorporation of prior expectations about observations. Uses read placement probability, strand balance probability, and read position (5'-3') probability.
+no      freebayes -a --allele-balance-priors-off (no|yes)               Disable use of aggregate probability of observation balance between alleles as a component of the priors.
+no      freebayes    --no-partial-observations (no|yes)                 Exclude observations which do not fully span the dynamically-determined detection window.  (default, use all observations, dividing partial support across matching haplotypes when generating haplotypes.)
+yes      freebayes    --report-monomorphic (no|yes)                      Report even loci which appear to be monomorphic, and report allconsidered alleles, even those which are not in called genotypes. Loci which do not have any potential alternates have '.' for ALT.
+
+------------------------------------------------------------------------------------------------------------------
+
+
+Email
+user@tamucc.edu
+
+Mon Nov 29 10:59:46 EST 2021 Reading in variables from config file...
+
+Mon Nov 29 10:59:46 EST 2021 Checking for all required dDocent software...
+
+ Running CheckDependencies Function...
+
+  The dependency trimmomatic is installed!
+
+  The dependency freebayes is installed!
+
+  The dependency mawk is installed!
+
+  The dependency bwa is installed!
+
+  The dependency samtools is installed!
+
+  The dependency vcftools is installed!
+
+  The dependency rainbow is installed!
+
+  The dependency gnuplot is installed!
+
+  The dependency gawk is installed!
+
+  The dependency seqtk is installed!
+
+  The dependency cd-hit-est is installed!
+
+  The dependency bamToBed is installed!
+
+  The dependency bedtools is installed!
+
+  The dependency coverageBed is installed!
+
+  The dependency parallel is installed!
+
+  The dependency vcfcombine is installed!
+
+  The dependency bamtools is installed!
+
+  The dependency pearRM is installed!
+
+ All dependencies are installed and up to date!
+
+
+Mon Nov 29 10:59:47 EST 2021  Begin main ddocent function
+
+ The HPC version of dDocent will only digest files with particular extensions for particular tasks
+  untouched files for trimming must be *.F.fq.gz and *.R.fq.gz
+  files trimmed for assembly (mkREF) must be *r1.fq.gz *r2.fq.gz
+  files trimmed for mapping (mkBAM) must be *R1.fq.gz *R2.fq.gz
+
+  extensions selected: *.R1.fq.gz *.R2.fq.gz
+
+ The namelist file already exists and was not recreated. 
+  If you experience errors, you should delete the namelist file.
+ 
+ The samples being processed are:
+  Gmi-ABas_001-GmA02001-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_002-GmA02002-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_004-GmA02004-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_005-GmA02005-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_006-GmA02006-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_007-GmA02007-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_008-GmA02008-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_017-GmA02017-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_018-GmA02018-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_019-GmA02019-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_020-GmA02020-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_021-GmA02021-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_022-GmA02022-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_023-GmA02023-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_028-GmA02028-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_030-GmA02030-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_033-GmA02033-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_034-GmA02034-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_035-GmA02035-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_044-GmA02044-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_045-GmA02045-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_047-GmA02047-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_049-GmA02049-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_054-GmA02054-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_055-GmA02055-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_058-GmA02058-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_059-GmA02059-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_060-GmA02060-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_001-GmA01001-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_002-GmA01002-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_003-GmA01003-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_004-GmA01004-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_010-GmA01010-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_011-GmA01011-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_013-GmA01013-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_014-GmA01014-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_015-GmA01015-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_016-GmA01016-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_017-GmA01017-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_018-GmA01018-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_026-GmA01026-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_027-GmA01027-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_028-GmA01028-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_029-GmA01029-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_030-GmA01030-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_031-GmA01031-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_032-GmA01032-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_033-GmA01033-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_035-GmA01035-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_037-GmA01037-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_039-GmA01039-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_041-GmA01041-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_042-GmA01042-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_055-GmA01055-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_060-GmA01060-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_065-GmA01065-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_074-GmA01074-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_078-GmA01078-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_079-GmA01079-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_083-GmA01083-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_089-GmA01089-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_001-GmC02001-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_002-GmC02002-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_006-GmC02006-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_007-GmC02007-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_008-GmC02008-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_011-GmC02011-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_012-GmC02012-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_013-GmC02013-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_014-GmC02014-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_015-GmC02015-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_016-GmC02016-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_017-GmC02017-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_018-GmC02018-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_019-GmC02019-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_020-GmC02020-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_021-GmC02021-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_022-GmC02022-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_023-GmC02023-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_024-GmC02024-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_025-GmC02025-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_026-GmC02026-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_027-GmC02027-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_029-GmC02029-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_031-GmC02031-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_033-GmC02033-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_034-GmC02034-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_035-GmC02035-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_036-GmC02036-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_038-GmC02038-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_039-GmC02039-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_041-GmC02041-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_043-GmC02043-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_044-GmC02044-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_048-GmC02048-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_049-GmC02049-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_050-GmC02050-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_051-GmC02052-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_054-GmC02054-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_056-GmC02056-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_057-GmC02057-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_059-GmC02059-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_063-GmC02063-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_064-GmC02064-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_066-GmC02066-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_068-GmC02068-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_069-GmC02069-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_072-GmC02072-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_075-GmC02075-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_077-GmC02077-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_080-GmC02080-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_082-GmC02082-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_083-GmC02083-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_086-GmC02086-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_087-GmC02087-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_092-GmC02092-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_095-GmC02095-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_002-GmC01002-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_005-GmC01005-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_006-GmC01006-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_008-GmC01008-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_009-GmC01009-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_012-GmC01012-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_013-GmC01013-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_014-GmC01014-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_016-GmC01016-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_017-GmC01017-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_018-GmC01018-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_021-GmC01021-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_022-GmC01022-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_026-GmC01026-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_028-GmC01028-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_029-GmC01029-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_032-GmC01032-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_033-GmC01033-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_035-GmC01035-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_036-GmC01036-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_037-GmC01037-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_038-GmC01038-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_040-GmC01040-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_041-GmC01041-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_042-GmC01042-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_045-GmC01045-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_047-GmC01047-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_051-GmC01051-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_053-GmC01053-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_054-GmC01054-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_057-GmC01057-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_058-GmC01058-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_061-GmC01061-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_062-GmC01062-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_066-GmC01066-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_068-GmC01068-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_069-GmC01069-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_070-GmC01070-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_071-GmC01071-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_072-GmC01072-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_073-GmC01073-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_074-GmC01074-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_075-GmC01075-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_077-GmC01077-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_078-GmC01078-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_080-GmC01080-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_081-GmC01081-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_082-GmC01082-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_085-GmC01085-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_086-GmC01086-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_087-GmC01087-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_089-GmC01089-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_090-GmC01090-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_092-GmC01092-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_093-GmC01093-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_094-GmC01094-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_095-GmC01095-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_096-GmC01096-L1-fp1-clmp-fp2-fqscrn-repr
+
+
+Mon Nov 29 10:59:51 EST 2021 Genotyping initiated...
+
+ Mon Nov 29 10:59:51 EST 2021  Preparing files for genotyping...
+
+  Mon Nov 29 10:59:51 EST 2021 Filtered BAM files detected with -RG.bam.
+  Mon Nov 29 11:04:07 EST 2021  Estimating coverage of ref intervals & remove extreme copy number loci...
+                                                                                                                        
+                             Scatter plot of total depth of coverage for each contig in cat*RRG.bam.                    
+                                                                                                                        
+       2e+07 +------------------------------------------------------------------------------------------------------+   
+             |                  +                   +                  +                  +                   +     |   
+             |                                                                                    'cov.dat'    *    |   
+             |                                                                                                      |   
+             |                                                                                                      |   
+             |                                                                                                      |   
+     1.5e+07 |-+                                                                                                  +-|   
+             |                                                                                                      |   
+             |                                                                                                      |   
+             |                                                                                                      |   
+             |                                                                                                      |   
+             |                                                                                                      |   
+       1e+07 |-+                                                                                                  +-|   
+             |                                                                                                      |   
+             |                                                                                                      |   
+             |                                                                                                      |   
+             |                                                                                                      |   
+       5e+06 |-+                                                                                                  +-|   
+             |                                                                                                      |   
+             |                                                                                                      |   
+             |                                                                                                      |   
+             |                                                                                                      |   
+             |                  +                   +                  +                  +                   +     |   
+           0 +------------------------------------------------------------------------------------------------------+   
+             0                 5000               10000              15000              20000               25000       
+                                                             Contig                                                     
+                                                                                                                        
+  Mon Nov 29 11:09:15 EST 2021  Filtering contigs with low coverage...
+  Mon Nov 29 11:09:16 EST 2021  Making the bed files...
+  Mon Nov 29 11:09:16 EST 2021  Creating popmap...
+
+Gmi-ABas_001-GmA02001-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_002-GmA02002-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_004-GmA02004-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_005-GmA02005-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_006-GmA02006-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_007-GmA02007-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_008-GmA02008-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_017-GmA02017-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_018-GmA02018-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_019-GmA02019-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_020-GmA02020-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_021-GmA02021-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_022-GmA02022-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_023-GmA02023-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_028-GmA02028-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_030-GmA02030-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_033-GmA02033-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_034-GmA02034-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_035-GmA02035-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_044-GmA02044-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_045-GmA02045-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_047-GmA02047-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_049-GmA02049-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_054-GmA02054-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_055-GmA02055-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_058-GmA02058-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_059-GmA02059-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_060-GmA02060-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-AHam_001-GmA01001-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_002-GmA01002-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_003-GmA01003-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_004-GmA01004-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_010-GmA01010-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_011-GmA01011-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_013-GmA01013-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_014-GmA01014-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_015-GmA01015-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_016-GmA01016-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_017-GmA01017-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_018-GmA01018-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_026-GmA01026-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_027-GmA01027-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_028-GmA01028-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_029-GmA01029-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_030-GmA01030-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_031-GmA01031-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_032-GmA01032-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_033-GmA01033-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_035-GmA01035-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_037-GmA01037-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_039-GmA01039-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_041-GmA01041-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_042-GmA01042-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_055-GmA01055-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_060-GmA01060-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_065-GmA01065-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_074-GmA01074-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_078-GmA01078-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_079-GmA01079-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_083-GmA01083-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_089-GmA01089-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-CBas_001-GmC02001-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_002-GmC02002-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_006-GmC02006-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_007-GmC02007-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_008-GmC02008-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_011-GmC02011-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_012-GmC02012-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_013-GmC02013-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_014-GmC02014-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_015-GmC02015-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_016-GmC02016-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_017-GmC02017-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_018-GmC02018-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_019-GmC02019-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_020-GmC02020-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_021-GmC02021-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_022-GmC02022-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_023-GmC02023-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_024-GmC02024-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_025-GmC02025-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_026-GmC02026-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_027-GmC02027-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_029-GmC02029-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_031-GmC02031-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_033-GmC02033-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_034-GmC02034-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_035-GmC02035-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_036-GmC02036-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_038-GmC02038-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_039-GmC02039-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_041-GmC02041-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_043-GmC02043-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_044-GmC02044-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_048-GmC02048-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_049-GmC02049-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_050-GmC02050-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_051-GmC02052-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_054-GmC02054-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_056-GmC02056-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_057-GmC02057-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_059-GmC02059-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_063-GmC02063-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_064-GmC02064-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_066-GmC02066-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_068-GmC02068-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_069-GmC02069-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_072-GmC02072-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_075-GmC02075-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_077-GmC02077-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_080-GmC02080-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_082-GmC02082-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_083-GmC02083-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_086-GmC02086-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_087-GmC02087-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_092-GmC02092-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_095-GmC02095-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBat_002-GmC01002-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_005-GmC01005-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_006-GmC01006-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_008-GmC01008-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_009-GmC01009-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_012-GmC01012-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_013-GmC01013-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_014-GmC01014-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_016-GmC01016-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_017-GmC01017-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_018-GmC01018-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_021-GmC01021-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_022-GmC01022-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_026-GmC01026-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_028-GmC01028-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_029-GmC01029-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_032-GmC01032-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_033-GmC01033-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_035-GmC01035-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_036-GmC01036-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_037-GmC01037-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_038-GmC01038-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_040-GmC01040-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_041-GmC01041-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_042-GmC01042-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_045-GmC01045-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_047-GmC01047-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_051-GmC01051-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_053-GmC01053-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_054-GmC01054-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_057-GmC01057-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_058-GmC01058-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_061-GmC01061-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_062-GmC01062-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_066-GmC01066-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_068-GmC01068-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_069-GmC01069-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_070-GmC01070-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_071-GmC01071-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_072-GmC01072-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_073-GmC01073-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_074-GmC01074-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_075-GmC01075-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_077-GmC01077-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_078-GmC01078-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_080-GmC01080-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_081-GmC01081-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_082-GmC01082-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_085-GmC01085-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_086-GmC01086-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_087-GmC01087-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_089-GmC01089-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_090-GmC01090-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_092-GmC01092-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_093-GmC01093-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_094-GmC01094-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_095-GmC01095-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_096-GmC01096-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+
+ Mon Nov 29 11:09:16 EST 2021  Genotyping individuals of ploidy 2 using freebayes...
+
+  Fri Dec 10 16:09:57 EST 2021 Cleaning up files...
+
+ Fri Dec 10 16:14:15 EST 2021 Assembling final VCF file...
+
+Compress large filesFri Dec 10 23:47:43 EST 2021

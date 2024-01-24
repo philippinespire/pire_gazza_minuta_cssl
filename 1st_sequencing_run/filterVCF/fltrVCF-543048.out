@@ -1,0 +1,71 @@
+
+
+fltrVCF.bash v4.4 -- a script to filter vcf files repeatably
+
+Dependencies required for fltrVCF to be fully functional:
+	R
+		tidyverse
+		gridExtra
+	vcftools
+	vcflib
+	samtools
+	perl
+	mawk
+	parallel
+	rad_haplotyper.pl https://github.com/cbirdlab/rad_haplotyper.git
+	filter_hwe_by_pop_HPC
+
+Thu Dec 16 15:15:34 EST 2021 Reading options from command line:
+
+	Settings File:            config.fltr.ind.cssl.HWE
+
+Thu Dec 16 15:15:34 EST 2021 Reading options from config file and setting defaults
+	SETTINGS are being loaded from file: 'config.fltr.ind.cssl.HWE'
+	Filters are set to '18 17'
+	CutoffCode is set to '.rad.RAW-10-10'
+	BAM_PATH is set to '../mkBAM'
+	SCRIPT_PATH is set to '../../scripts/fltrVCF/scripts'
+	VCF_FILE is set to 'Gmi.A.rad.RAW-10-10.Fltr07.18.vcf'
+	Bed file is set to '../mkBAM/mapped.rad.RAW-10-10.bed'
+	Reference genome is set to '../mkBAM/reference.rad.RAW-10-10.fasta'
+	PopMap is set to 'popmap.rad.RAW-10-10.HWEsplit'
+	HWE_SCRIPT is set to '../../scripts/fltrVCF/filter_hwe_by_pop_HPC.pl'
+	RADHAP_SCRIPT is set to '../../scripts/rad_haplotyper/rad_haplotyper.pl'
+	Output file prefix is set to 'Gmi.A.HWE'
+	The number of threads is set to '40'
+	-P not set by user. Only filters that natively support parallelization will be run in parallel.
+	Gmi.A.rad.RAW-10-10.Fltr07.18.vcf will be used for serial processing.
+
+Thu Dec 16 15:15:35 EST 2021 Getting universal chromosome/contig prefix ...
+          Querying Gmi.A.rad.RAW-10-10.Fltr07.18.vcf ...
+          Prefix: dDocent
+          It is assumed that all values in the CHROM column of vcf begin with dDocent
+          If this is not the case, then fltrVCF will not work properly.
+          The prefix is used to count SNPs/variants, contigs, etc and is used in some filters.
+
+Thu Dec 16 15:15:35 EST 2021  reading variables into MAIN
+
+Thu Dec 16 15:15:35 EST 2021 ---------------------------FILTER18: Remove sites not in HWE p<X) -----------------------------
+Processing population: Gmi-ABas-A (28 inds)
+Processing population: Gmi-AHam-A (22 inds)
+Processing population: Gmi-AHam-B (11 inds)
+Processing population: Gmi-CBas-A (56 inds)
+Processing population: Gmi-CBat-A (46 inds)
+Processing population: Gmi-CBat-B (12 inds)
+Outputting results of HWE test for filtered loci to 'filtered.hwe'
+Kept 20967 of a possible 21910 loci (filtered 943 loci)
+
+	Sites remaining:	20967
+	Contigs remaining:	3865
+	Sites remaining:	20967
+	Contigs remaining:	3865
+
+Thu Dec 16 15:15:52 EST 2021 ---------------------------FILTER17: Remove sites with data missing for too many individuals|libraries in a population -----------------------------
+     Using PopMap File: popmap.rad.RAW-10-10.HWEsplit
+     vcftools --vcf Gmi.A.HWE.rad.RAW-10-10.Fltr18.1.HWE.recode.vcf --exclude-positions Gmi.A.HWE.rad.RAW-10-10.Fltr17.2.badloci --recode --recode-INFO-all --out Gmi.A.HWE.rad.RAW-10-10.Fltr17.2.recode.vcf 2> /dev/null
+	Sites remaining:	17434
+	Contigs remaining:	3439
+
+
+Thu Dec 16 15:16:17 EST 2021  --------------------------- Filtering complete! ---------------------------
+

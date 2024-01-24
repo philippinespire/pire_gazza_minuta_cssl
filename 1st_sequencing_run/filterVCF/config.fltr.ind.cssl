@@ -1,0 +1,72 @@
+This is a configuration file for fltrVCF to control filters, filter order, and filter thresholds.  Each row controls a setting and will be listed by command and argument.  Settings here will be overridden by arguments specified at the command line
+
+For all fltrVCF options use the -h argument at the command line.
+
+Notes: These settings are designed to clean a raw VCF file made from individuals and retain as much biological variation as possible.
+
+fltrVCF Settings, run fltrVCF -h for description of settings
+        # Paths assume you are in `filterVCF dir` when running fltrVCF, change as necessary
+        fltrVCF -f 01 02 03 04 14 07 05 16 15 06 11 09 10 04 13 05 16 07 18 17               # order to run filters in
+        fltrVCF -c rad.RAW-10-10                               # cutoffs, ie ref description
+        fltrVCF -b ../mkBAM                                                                  # path to *.bam files
+        fltrVCF -R ../../scripts/fltrVCF/scripts                                             # path to fltrVCF R scripts
+        fltrVCF -d ../mkBAM/mapped.rad.RAW-10-10.bed           # bed file used in genotyping
+        fltrVCF -v TotalRawSNPs.rad.RAW-10-10.noindvless100Kseq.Basonly.vcf  # vcf file to filter
+        fltrVCF -g ../mkBAM/reference.rad.RAW-10-10.fasta      # reference genome
+        fltrVCF -p ../mkBAM/popmap.rad.RAW-10-10                # popmap file
+        fltrVCF -w ../../scripts/fltrVCF/filter_hwe_by_pop_HPC.pl                            # path to HWE filter script
+        fltrVCF -r ../../scripts/rad_haplotyper/rad_haplotyper.pl                            # path to rad_haplotyper script
+        fltrVCF -o Gmi.A.Hamonly                                                                     # prefix on output files, use to track settings
+        fltrVCF -t 40                                                                        # number of threads [1]
+        
+Filters
+        # See manual for how to pass multiple settings to filters that are run multiple times
+        # Only edit the values in the third column
+        30  custom bash                 5               #Keep sites after this position (bp)
+        30  custom bash                 150             #Keep sites before this position (bp)
+        31  custom bash                 100             #Remove contigs with fewer BP
+        32  custom bash                 0.9             #Keep contigs with lesser porportion of heterozygotes, high heterozygosity indicates paralogs
+
+        01 vcftools --min-alleles       2               #Remove sites with less alleles [2]
+        01 vcftools --max-alleles       2               #Remove sites with more alleles [2]
+        02 vcftools --remove-indels                     #Remove sites with indels.  Not adjustable
+        03 vcftools --minQ              100             #Remove sites with lower QUAL [20]
+        04 vcftools --min-meanDP        5:15            #Remove sites with lower mean depth [15]
+        041 custom bash                 0.01            #Remove contigs with lower mean of mean depth across sites, percentile [0.01]
+        041 custom bash                 0.99            #Remove contigs with higher mean of mean depth across sites, percentile [0.99]
+        041 custom bash                 0               #Remove contigs with lower CV of mean depth across sites, percentile [0]
+        041 custom bash                 0.99            #Remove contigs with higher CV of mean depth across sites, percentile [0.99]
+        05 vcftools --max-missing       0.55:0.6        #Remove sites with at least 1 - value missing data (1 = no missing data) [0.5]
+
+        06 vcffilter AB min             0.25           #Remove sites with equal or lower allele balance [0.2]
+        06 vcffilter AB max             0.75           #Remove sites with equal or lower allele balance [0.8]
+        06 vcffilter AB nohet           0               #Keep sites with AB=0. Not adjustable
+        07 vcffilter AC min             0               #Remove sites with equal or lower MINOR allele count [3]
+        08 vcffilter SAF/SAR min        10              #Remove sites where both read1 and 2 overlap. Remove sites with equal or lower (SAF/SAR & SRF/SRR | SAR/SAF & SRR/SRF). These are the number of F and R reads supporting the REF or ALT alleles.  [10]
+        09 vcffilter MQM/MQMR min       0.25            #Remove sites where the difference in the ratio of mean mapping quality between REF and ALT alleles is greater than this proportion from 1. Ex: 0 means the mapping quality must be equal between REF and ALTERNATE. Smaller numbers are more stringent. Keep sites where the following is true: 1-X < MQM/MQMR < 1/(1-X) [0.1]
+        10 vcffilter PAIRED                             #Remove sites where one of the alleles is only supported by reads that are not properly paired (see SAM format specification). Not adjustabe
+        11 vcffilter QUAL/DP min        0.2             #Remove sites where the ratio of QUAL to DP is deemed to be too low. [0.25]
+
+        12 vcftools QUAL/DP max                         #Remove sites where the ratio of QUAL to DP is deemed to be too high (2x). Not adjustable
+        13 vcftools --max-meanDP        400             #Remove sites with higher mean depth [250]
+        131 custom bash                 250             #Remove contigs with higher mean of mean depths across sites
+        14 vcftools --minDP             5               #Code genotypes with lesser depth of coverage as NA [5]
+        15 vcftools --maf               0               #Remove sites with lesser minor allele frequency.  Adjust based upon sample size. [0.005]
+        15 vcftools --max-maf           1               #Remove sites with greater minor allele frequency.  Adjust based upon sample size. [0.995]
+        16 vcftools --missing-indv      0.6:0.5         #Remove individuals with more missing data. [0.5]
+        161 vcftools --remove           rmInd.txt       #Remove individuals listed in file
+        17 vcftools --missing-sites     0.5             #Remove sites with more data missing in a pop sample. [0.5]
+        18 filter_hwe_by_pop_HPC        0.001           #Remove sites with <p in test for HWE by pop sample. Adjust based upon sample size [0.001]
+        181 filter_hwe_by_pop_HPC                       #Uses setting from Fltr 18, produces vcf files for both sites and contigs that both pass and fail HWE, only contigs where all sites passed the HWE test are pushed forward to the next filter
+        
+        19 rad_haplotyper       -d      50              #depth of sampling reads for building haplotypes. [50]
+        19 rad_haplotyper       -mp     1               #Remove sites with more paralogous indivduals. Adjust according to sample size. [10]
+        19 rad_haplotyper       -u      15              #Remove contigs with more SNPs. Adjust according to sequence length. [30]
+        19 rad_haplotyper       -ml     10              #Remove contigs with more individuals exhibiting low coverage or genotyping errors [10]
+        19 rad_haplotyper       -h      25              #Remove contigs with greater NumHaplotypes-NumSNPs. [100]
+        19 rad_haplotyper       -z      0.2             #Remove up to this proportion or number of reads when testing for paralogs.  The more real variation in your data set, the greater this number will be. (<1) or number (>=1) of reads. [0.1]
+        19 rad_haplotyper       -m      0.8             #Keep loci with a greater proportion of haplotyped individuals  [0.5]
+        
+        20 OneRandSNP                                   #Keep 1 random SNP per contig. Not adjustable. Can't be run after filter 21.
+        21 MostInformativeSNPs                          #Keep the most informative SNP per contig. Not adjustable.  Can't be run after filter 20.
+        86 rmContigs                                    #Remove contigs that have had SNPs removed by the previous filter.  Intended to be run after filters 05, 06, 13, 14, 17, 18 if desired.
