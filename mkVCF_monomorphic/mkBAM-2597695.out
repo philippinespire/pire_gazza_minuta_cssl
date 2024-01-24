@@ -1,0 +1,850 @@
+
+
+* dDocentHPC v4.6 Forked by cbird@tamucc.edu * 
+
+
+Running dDocentHPC mkVCF in OVERWRITE mode. \n          Sample names, file indexing, etc will be overwritten to clear errors...
+ 
+Tue Nov 21 12:37:14 EST 2023 Files output to:  /home/e1garcia/shotgun_PIRE/pire_cssl_data_processing/gazza_minuta/mkVCF_monomorphic
+
+Tue Nov 21 12:37:14 EST 2023 Reading config file... 
+ 
+Settings for dDocentHPC
+#Made in notepad++, use for best viewing
+
+These default settings assume ddRAD, no overlapping 151 bp reads
+
+All		Number of Processors (Not Adjustable)
+All		Free Memory (Not Adjustable)
+
+----------trimFQ: Settings for Trimming FASTQ Files---------------------------------------------------------------
+146		trimmomatic MINLEN (integer, mkREF only)						Drop the read if it is below a specified length. Set to the length of the Read1 reads.
+33		trimmomatic MINLEN (integer, mkBAM only)						Drop the read if it is below a specified length. Set to the minimum frag length you want mapped to the reference.
+20		trimmomatic LEADING:<quality> (integer, mkBAM only)				Specifies the minimum quality required to keep a base.
+15		trimmomatic TRAILING:<quality> (integer, mkREF only)			Specifies the minimum quality required to keep a base.
+20		trimmomatic TRAILING:<quality> (integer, mkBAM only)			Specifies the minimum quality required to keep a base.
+TruSeq3-PE-2.fa	trimmomatic ILLUMINACLIP:<fasta> (0, fasta file name)			Specifies the trimmomatic adapter file to use. entering a 0 (zero) will turn off adapter trimming. Options are: TruSeq3-PE-2.fa, TruSeq3-PE.fa, TruSeq3-SE.fa, TruSeq2-PE.fa, TruSeq2-SE.fa, any other files included with trimmomatic.  Entering a custom path here will break the script. If you want a customized file, you have to put it where the default trimmomatic files are located on your computer.  If you have trouble finding this location, run dDocentHPC trimREF and it will be included in the output.
+2		trimmomatic ILLUMINACLIP:<seed mismatches> (integer)			specifies the maximum mismatch count which will still allow a full match to be performed
+30		trimmomatic ILLUMINACLIP:<palindrome clip thresh> (integer)		specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment
+10		trimmomatic ILLUMINACLIP:<simple clip thresh> (integer)			specifies how accurate the match between any adapter etc. sequence must be against a read.
+20		trimmomatic SLIDINGWINDOW:<windowSize> (integer)				specifies the number of bases to average across
+20		trimmomatic SLIDINGWINDOW:<windowQuality> (integer)				specifies the average quality required.
+0		trimmomatic CROP:<bp to keep> (integer, mkBAM only)    Trim read sequences down to this length. Enter 0 for no cropping
+0		trimmomatic HEADCROP:<length> (integer, only Read1 for ezRAD)	The number of bases to remove from the start of the read. 0 for ddRAD, 5 for ezRAD
+no		FixStacks (yes,no)   											Demultiplexing with stacks introduces anomolies.  This removes them.  
+------------------------------------------------------------------------------------------------------------------
+
+----------mkREF: Settings for de novo assembly of the reference genome--------------------------------------------
+PE		Type of reads for assembly (PE, SE, OL, RPE)					PE=ddRAD & ezRAD pairedend, non-overlapping reads; SE=singleend reads; OL=ddRAD & ezRAD overlapping reads, miseq; RPE=oregonRAD, restriction site + random shear
+0.9		cdhit Clustering_Similarity_Pct (0-1)							Use cdhit to cluster and collapse uniq reads by similarity threshold
+rad		Cutoff1 (integer)												Use unique reads that have at least this much coverage for making the reference	genome
+RAW-10-10-rescaled		Cutoff2 (integer)												Use unique reads that occur in at least this many individuals for making the reference genome
+0.05	rainbow merge -r <percentile> (decimal 0-1)						Percentile-based minimum number of seqs to assemble in a precluster
+0.95	rainbow merge -R <percentile> (decimal 0-1)						Percentile-based maximum number of seqs to assemble in a precluster
+------------------------------------------------------------------------------------------------------------------
+
+----------mkBAM: Settings for mapping the reads to the reference genome-------------------------------------------
+Make sure the cutoffs above match the reference*fasta!
+1		bwa mem -A Mapping_Match_Value (integer) 						bwa mem default is 1
+4		bwa mem -B Mapping_MisMatch_Value (integer) 					bwa mem default is 4
+6		bwa mem -O Mapping_GapOpen_Penalty (integer) 					bwa mem default is 6
+30		bwa mem -T Mapping_Minimum_Alignment_Score (integer) 			bwa mem default is 30. Remove reads that have an alignment score less than this. don't go lower than 1 or else the resulting file will be huge. NOTE! in fltrBAM settings (below) there is an alignment score filter that uses a threshold relative to read length.  This -T setting here affects which reads the relative alignment score threshold will be applied to.
+5	bwa mem -L Mapping_Clipping_Penalty (integer,integer) 			bwa mem default is 5
+------------------------------------------------------------------------------------------------------------------
+
+----------fltrBAM: Settings for filtering mapping alignments in the *bam files---------------
+20		samtools view -q 		Mapping_Min_Quality (integer)    									Remove reads with mapping qual less than this value
+yes		samtools view -F 4 		Remove_unmapped_reads? (yes,no)   									Since the reads aren't mapped, we generally don't need to filter them
+no		samtools view -F 8 		Remove_read_pair_if_one_is_unmapped? (yes,no)    					If either read in a pair does not map, then the other is also removed
+yes		samtools view -F 256 	Remove_secondary_alignments? (yes,no)     							Secondary alignments are reads that also map to other contigs in the reference genome
+no		samtools view -F 512 	Remove_reads_not_passing_platform_vendor_filters (yes,no)     		We generally don't see any of these
+no		samtools view -F 1024 	Remove_PCR_or_optical_duplicates? (yes,no)     						You probably don't want to set this to yes
+no		samtools view -F 2048 	Remove_supplementary_alignments? (yes,no)     						We generally don't see any of these
+no		samtools view -f 2 		Keep_only_properly_aligned_read_pairs? (yes,no)						Set to no if OL mode 
+0		samtools view -F 		Custom_samtools_view_F_bit_value? (integer)     					performed separately from the above, consult samtools man
+0		samtools view -f 		Custom_samtools_view_f_bit_value? (integer)     					performed separately from the above, consult samtools man
+30								Remove_reads_with_excessive_soft_clipping? (no, integers)			minimum number of soft clipped bases in a read, summed between the beginning and end, that are unacceptable
+30								Remove_reads_with_alignment_score_below_relative_threshold (integer)	Alignment score thresholds are calculated based on this value adjusted by a factor (actual read length relative the assumed read length value in next setting). RelativeThreshold = as_threshold * actual_read_length / assumed_read_length, where this setting controls as_threshold. NOTE! bwa mem -T affects which reads are mapped based on alignment score, and therefore this filter cannot save reads elimated by bwa mem -T, but if the -T setting is too low then the RAW bam files can be huge.
+130								Read_length_assumed_by_relative_alignment_score_threshold (integer)	Alignment score thresholds are calculated based on the threshold in the previous setting adjusted by a factor (actual read length relative the assumed read length value here). RelativeThreshold= as_threshold * actual_read_length / assumed_read_length, where this setting controls assumed_read_length
+no								Remove_reads_orphaned_by_filters? (yes,no)
+------------------------------------------------------------------------------------------------------------------
+
+----------mkVCF: Settings for variant calling/ genotyping---------------------------------------------------------
+no		freebayes -J --pooled-discrete (yes|no) 						If yes, a pool of individuals is assumed to be the statistical unit of observation. 
+no		freebayes -A --cnv-map (filename.bed or no)						If the pools have different numbers of individuals, then you should provide a copy number variation (cnv) *.bed file with the "ploidy" of each pool. the bed file should be in the working directory and formatted as follows: popmap_column_1 ploidy_of_pool.  If that doesn't work, try the basenames of the files in popmap column 1.
+2		freebayes -p --ploidy (integer)									Whether pooled or not, if no cnv-map file is provided, then what is the ploidy of the samples? for pools, this number should be the number of individuals * ploidy
+no		freebayes -r --region (filename.bed or no)						Limit analysis to specified region.  Bed file format: <chrom>:<start_position>-<end_position>
+0		only genotype read 1 (integer)									Limit analysis to only Read 1 positions, integer is maximum Read1 bp position
+0		Minimum Mean Depth of Coverage Per Individual					Limit analysis to contigs with at least the specified mean depth of coverage per individual
+0		freebayes -n --use-best-n-alleles (integer)						reduce the number of alleles considered to n, zero means all, set to 2 or more if you run out of memory
+30		freebayes -m --min-mapping-quality (integer) 
+20		freebayes -q --min-base-quality (integer) 
+-1		freebayes -E --haplotype-length (-1, 3, or integer)    			Set to -1 to avoid multi nucleotide polymorphisms and force calling MNPs as SNPs.  Can be set up to half the read length, or more.
+0		freebayes    --min-repeat-entropy (0, 1, or integer) 			Set to 0 to avoid multi nucleotide polymorphisms and force calling MNPs as SNPs. To detect interrupted repeats, build across sequence until it has entropy > N bits per bp. 
+10		freebayes    --min-coverage (integer)       					Require at least this coverage to process a site
+0.375	freebayes -F --min-alternate-fraction (decimal 0-1)   			There must be at least 1 individual with this fraction of alt reads to evaluate the position. If your individuals are barcoded, then use 0.2. If your data is pooled, then set based upon ~ 1/(numIndivids * ploidy) and average depth of coverage
+2		freebayes -C --min-alternate-count (integer)					Require at least this count of observations supporting an alternate allele within a single individual in order to evaluate the position.  default: 2
+10		freebayes -G --min-alternate-total (integer)					Require at least this count of observations supporting an alternate allele within the total population in order to use the allele in analysis.  default: 1
+0.33	freebayes -z --read-max-mismatch-fraction (decimal 0-1)			Exclude reads with more than N [0,1] fraction of mismatches where each mismatch has base quality >= mismatch-base-quality-threshold default: 1.0
+20		freebayes -Q --mismatch-base-quality-threshold (integer)		Count mismatches toward --read-mismatch-limit if the base quality of the mismatch is >= Q.  default: 10
+50		freebayes -U --read-mismatch-limit (integer)					Exclude reads with more than N mismatches where each mismatch has base quality >= mismatch-base-quality-threshold. default: ~unbounded
+20		freebayes ~3 ~~min-alternate-qsum (integer)						This value is the mean base quality score for alternate reads and will be multiplied by -C to set -3. Description of -3: Require at least this count of observations supporting an alternate allele within a single individual in order to evaluate the position.  default: 2	
+50		freebayes -$ --read-snp-limit (integer)							Exclude reads with more than N base mismatches, ignoring gaps with quality >= mismatch-base-quality-threshold. default: ~unbounded
+20		freebayes -e --read-indel-limit	(integer)						Exclude reads with more than N separate gaps. default: ~unbounded
+no		freebayes -w --hwe-priors-off (no|yes)							Disable estimation of the probability of the combination arising under HWE given the allele frequency as estimated by observation frequency.
+no		freebayes -V --binomial-obs-priors-off (no|yes)					Disable incorporation of prior expectations about observations. Uses read placement probability, strand balance probability, and read position (5'-3') probability.
+no		freebayes -a --allele-balance-priors-off (no|yes)				Disable use of aggregate probability of observation balance between alleles as a component of the priors.
+no		freebayes    --no-partial-observations (no|yes)					Exclude observations which do not fully span the dynamically-determined detection window.  (default, use all observations, dividing partial support across matching haplotypes when generating haplotypes.)
+yes		freebayes    --report-monomorphic (no|yes)						Report even loci which appear to be monomorphic, and report allconsidered alleles, even those which are not in called genotypes. Loci which do not have any potential alternates have '.' for ALT.
+
+------------------------------------------------------------------------------------------------------------------
+
+
+Email
+user@tamucc.edu
+
+
+Tue Nov 21 12:37:14 EST 2023 Reading in variables from config file...
+
+Tue Nov 21 12:37:15 EST 2023 Checking for all required dDocent software...
+
+ Running CheckDependencies Function...
+
+  The dependency trimmomatic is installed!
+
+  The dependency freebayes is installed!
+
+  The dependency mawk is installed!
+
+  The dependency bwa is installed!
+
+  The dependency samtools is installed!
+
+  The dependency vcftools is installed!
+
+  The dependency rainbow is installed!
+
+  The dependency gnuplot is installed!
+
+  The dependency gawk is installed!
+
+  The dependency seqtk is installed!
+
+  The dependency cd-hit-est is installed!
+
+  The dependency bamToBed is installed!
+
+  The dependency bedtools is installed!
+
+  The dependency coverageBed is installed!
+
+  The dependency parallel is installed!
+
+  The dependency vcfcombine is installed!
+
+  The dependency bamtools is installed!
+
+  The dependency pearRM is installed!
+
+ All dependencies are installed and up to date!
+
+
+Tue Nov 21 12:37:16 EST 2023  Begin main ddocent function
+
+ The HPC version of dDocent will only digest files with particular extensions for particular tasks
+  untouched files for trimming must be *.F.fq.gz and *.R.fq.gz
+  files trimmed for assembly (mkREF) must be *r1.fq.gz *r2.fq.gz
+  files trimmed for mapping (mkBAM) must be *R1.fq.gz *R2.fq.gz
+
+  extensions selected: *.R1.fq.gz *.R2.fq.gz
+ 
+ The samples being processed are:
+  Gmi-ABas_001-merged.rgfix
+  Gmi-ABas_002-GmA02002-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2-repr
+  Gmi-ABas_004-merged.rgfix
+  Gmi-ABas_005-GmA02005-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_006-GmA02006-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_007-GmA02007-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_008-merged.rgfix
+  Gmi-ABas_009-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_010-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_011-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_012-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_013-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_014-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_015-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_016-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_017-merged.rgfix
+  Gmi-ABas_018-merged.rgfix
+  Gmi-ABas_019-merged.rgfix
+  Gmi-ABas_020-GmA02020-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_021-GmA02021-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_022-merged.rgfix
+  Gmi-ABas_023-GmA02023-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_024-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_025-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_026-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_027-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_028-merged.rgfix
+  Gmi-ABas_029-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_030-merged.rgfix
+  Gmi-ABas_031-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_032-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_033-merged.rgfix
+  Gmi-ABas_034-merged.rgfix
+  Gmi-ABas_035-merged.rgfix
+  Gmi-ABas_036-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_037-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_038-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_039-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_040-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_041-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_042-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_043-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_044-GmA02044-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_045-merged.rgfix
+  Gmi-ABas_046-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_047-merged.rgfix
+  Gmi-ABas_048-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_049-merged.rgfix
+  Gmi-ABas_050-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_051-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_052-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_053-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_054-GmA02054-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-ABas_055-merged.rgfix
+  Gmi-ABas_056-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_057-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-ABas_058-merged.rgfix
+  Gmi-ABas_059-merged.rgfix
+  Gmi-ABas_060-merged.rgfix
+  Gmi-ABas_061-Ex1-b-cssl.clmp.fp2-repr
+  Gmi-AHam_001-merged.rgfix
+  Gmi-AHam_002-merged.rgfix
+  Gmi-AHam_003-GmA01003-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_004-GmA01004-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_005-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_006-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_007-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_008-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_009-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_010-GmA01010-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_011-GmA01011-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_012-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_013-merged.rgfix
+  Gmi-AHam_014-GmA01014-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_015-merged.rgfix
+  Gmi-AHam_016-merged.rgfix
+  Gmi-AHam_017-GmA01017-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_018-GmA01018-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_019-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_020-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_021-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_022-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_023-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_024-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_025-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_026-GmA01026-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_027-GmA01027-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_028-GmA01028-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_029-GmA01029-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_030-GmA01030-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_031-GmA01031-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_032-GmA01032-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_033-GmA01033-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_034-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_035-GmA01035-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_036-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_037-GmA01037-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_038-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_039-GmA01039-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_040-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_041-GmA01041-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_042-GmA01042-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_043-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_044-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_045-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_046-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_047-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_048-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_049-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_050-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_051-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_052-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_053-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_054-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_055-GmA01055-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_056-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_057-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_058-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_059-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_060-GmA01060-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_061-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_062-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_063-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_064-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_065-GmA01065-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_066-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_067-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_068-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_069-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_070-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_071-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_072-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_073-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_074-merged.rgfix
+  Gmi-AHam_075-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_076-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_077-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_078-GmA01078-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_079-GmA01079-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_080-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_081-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_082-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_083-GmA01083-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_084-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_086-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_087-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_088-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_089-GmA01089-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-AHam_090-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_091-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_092-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_093-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_094-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_095-Ex1-cssl.clmp.fp2-repr
+  Gmi-AHam_096-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_001-GmC02001-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_002-GmC02002-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_003-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_004-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_005-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_006-merged.rgfix
+  Gmi-CBas_007-merged.rgfix
+  Gmi-CBas_008-GmC02008-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_009-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_010-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_011-GmC02011-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_012-merged.rgfix
+  Gmi-CBas_013-merged.rgfix
+  Gmi-CBas_014-merged.rgfix
+  Gmi-CBas_015-merged.rgfix
+  Gmi-CBas_016-merged.rgfix
+  Gmi-CBas_017-merged.rgfix
+  Gmi-CBas_018-GmC02018-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_019-merged.rgfix
+  Gmi-CBas_020-GmC02020-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_021-GmC02021-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_022-GmC02022-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_023-merged.rgfix
+  Gmi-CBas_024-merged.rgfix
+  Gmi-CBas_025-GmC02025-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_026-merged.rgfix
+  Gmi-CBas_027-merged.rgfix
+  Gmi-CBas_028-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_029-merged.rgfix
+  Gmi-CBas_031-GmC02031-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_033-merged.rgfix
+  Gmi-CBas_034-merged.rgfix
+  Gmi-CBas_035-GmC02035-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_036-GmC02036-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_038-GmC02038-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_039-merged.rgfix
+  Gmi-CBas_041-merged.rgfix
+  Gmi-CBas_043-GmC02043-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_044-GmC02044-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_045-Ex1-cssl2.clmp.fp2-repr
+  Gmi-CBas_046-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_047-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_048-merged.rgfix
+  Gmi-CBas_049-merged.rgfix
+  Gmi-CBas_050-GmC02050-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_051-GmC02052-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_053-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_054-merged.rgfix
+  Gmi-CBas_055-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_056-GmC02056-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_057-merged.rgfix
+  Gmi-CBas_058-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_059-GmC02059-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_060-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_061-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_063-GmC02063-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_064-merged.rgfix
+  Gmi-CBas_066-merged.rgfix
+  Gmi-CBas_067-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_068-merged.rgfix
+  Gmi-CBas_069-merged.rgfix
+  Gmi-CBas_070-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_071-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_072-GmC02072-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_075-merged.rgfix
+  Gmi-CBas_077-GmC02077-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_078-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_079-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_080-merged.rgfix
+  Gmi-CBas_081-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_082-merged.rgfix
+  Gmi-CBas_083-merged.rgfix
+  Gmi-CBas_084-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_085-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_086-merged.rgfix
+  Gmi-CBas_087-GmC02087-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBas_088-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_089-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_090-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_091-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_092-merged.rgfix
+  Gmi-CBas_093-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_094-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBas_095-merged.rgfix
+  Gmi-CBat_001-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_002-merged.rgfix
+  Gmi-CBat_003-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_004-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_005-merged.rgfix
+  Gmi-CBat_006-GmC01006-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_008-GmC01008-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_009-GmC01009-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_010-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_011-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_012-merged.rgfix
+  Gmi-CBat_013-merged.rgfix
+  Gmi-CBat_014-GmC01014-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_015-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_016-GmC01016-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_017-GmC01017-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_018-merged.rgfix
+  Gmi-CBat_019-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_020-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_021-merged.rgfix
+  Gmi-CBat_022-merged.rgfix
+  Gmi-CBat_023-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_024-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_025-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_026-GmC01026-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_027-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_028-GmC01028-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_029-GmC01029-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_030-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_031-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_032-GmC01032-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_033-GmC01033-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_034-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_035-merged.rgfix
+  Gmi-CBat_036-merged.rgfix
+  Gmi-CBat_037-merged.rgfix
+  Gmi-CBat_038-GmC01038-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_039-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_040-merged.rgfix
+  Gmi-CBat_041-GmC01041-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_042-merged.rgfix
+  Gmi-CBat_043-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_044-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_045-GmC01045-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_046-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_047-merged.rgfix
+  Gmi-CBat_048-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_049-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_050-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_051-merged.rgfix
+  Gmi-CBat_052-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_053-GmC01053-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_054-GmC01054-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_056-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_057-GmC01057-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_058-merged.rgfix
+  Gmi-CBat_059-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_060-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_061-merged.rgfix
+  Gmi-CBat_062-merged.rgfix
+  Gmi-CBat_063-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_064-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_065-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_066-merged.rgfix
+  Gmi-CBat_067-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_068-GmC01068-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_069-GmC01069-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_070-merged.rgfix
+  Gmi-CBat_071-merged.rgfix
+  Gmi-CBat_072-GmC01072-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_073-GmC01073-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_074-GmC01074-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_075-GmC01075-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_076-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_077-GmC01077-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_078-GmC01078-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_079-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_080-merged.rgfix
+  Gmi-CBat_081-merged.rgfix
+  Gmi-CBat_082-merged.rgfix
+  Gmi-CBat_083-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_084-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_085-GmC01085-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_086-GmC01086-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_087-GmC01087-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_088-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_089-GmC01089-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_090-GmC01090-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_091-Ex1-cssl.clmp.fp2-repr
+  Gmi-CBat_092-GmC01092-L1-fp1-clmp-fp2-fqscrn-repr
+  Gmi-CBat_093-merged.rgfix
+  Gmi-CBat_094-merged.rgfix
+  Gmi-CBat_095-merged.rgfix
+  Gmi-CBat_096-merged.rgfix
+
+
+Tue Nov 21 12:37:19 EST 2023 Genotyping initiated...
+
+ Tue Nov 21 12:37:19 EST 2023  Preparing files for genotyping...
+
+  Tue Nov 21 12:37:19 EST 2023 Filtered BAM files detected with -RG.bam.
+  Tue Nov 21 12:51:10 EST 2023  Estimating coverage of ref intervals & remove extreme copy number loci...
+gnuplot: error while loading shared libraries: libjpeg.so.8: cannot open shared object file: No such file or directory
+  Tue Nov 21 13:07:30 EST 2023  Filtering contigs with low coverage...
+  Tue Nov 21 13:07:30 EST 2023  Making the bed files...
+  Tue Nov 21 13:07:30 EST 2023  Creating popmap...
+
+Gmi-ABas_001-merged.rgfix	Gmi-ABas
+Gmi-ABas_002-GmA02002-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_004-merged.rgfix	Gmi-ABas
+Gmi-ABas_005-GmA02005-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_006-GmA02006-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_007-GmA02007-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_008-merged.rgfix	Gmi-ABas
+Gmi-ABas_009-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_010-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_011-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_012-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_013-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_014-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_015-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_016-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_017-merged.rgfix	Gmi-ABas
+Gmi-ABas_018-merged.rgfix	Gmi-ABas
+Gmi-ABas_019-merged.rgfix	Gmi-ABas
+Gmi-ABas_020-GmA02020-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_021-GmA02021-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_022-merged.rgfix	Gmi-ABas
+Gmi-ABas_023-GmA02023-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_024-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_025-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_026-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_027-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_028-merged.rgfix	Gmi-ABas
+Gmi-ABas_029-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_030-merged.rgfix	Gmi-ABas
+Gmi-ABas_031-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_032-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_033-merged.rgfix	Gmi-ABas
+Gmi-ABas_034-merged.rgfix	Gmi-ABas
+Gmi-ABas_035-merged.rgfix	Gmi-ABas
+Gmi-ABas_036-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_037-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_038-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_039-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_040-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_041-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_042-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_043-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_044-GmA02044-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_045-merged.rgfix	Gmi-ABas
+Gmi-ABas_046-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_047-merged.rgfix	Gmi-ABas
+Gmi-ABas_048-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_049-merged.rgfix	Gmi-ABas
+Gmi-ABas_050-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_051-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_052-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_053-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_054-GmA02054-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-ABas
+Gmi-ABas_055-merged.rgfix	Gmi-ABas
+Gmi-ABas_056-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_057-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-ABas_058-merged.rgfix	Gmi-ABas
+Gmi-ABas_059-merged.rgfix	Gmi-ABas
+Gmi-ABas_060-merged.rgfix	Gmi-ABas
+Gmi-ABas_061-Ex1-b-cssl.clmp.fp2-repr	Gmi-ABas
+Gmi-AHam_001-merged.rgfix	Gmi-AHam
+Gmi-AHam_002-merged.rgfix	Gmi-AHam
+Gmi-AHam_003-GmA01003-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_004-GmA01004-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_005-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_006-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_007-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_008-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_009-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_010-GmA01010-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_011-GmA01011-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_012-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_013-merged.rgfix	Gmi-AHam
+Gmi-AHam_014-GmA01014-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_015-merged.rgfix	Gmi-AHam
+Gmi-AHam_016-merged.rgfix	Gmi-AHam
+Gmi-AHam_017-GmA01017-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_018-GmA01018-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_019-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_020-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_021-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_022-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_023-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_024-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_025-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_026-GmA01026-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_027-GmA01027-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_028-GmA01028-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_029-GmA01029-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_030-GmA01030-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_031-GmA01031-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_032-GmA01032-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_033-GmA01033-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_034-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_035-GmA01035-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_036-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_037-GmA01037-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_038-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_039-GmA01039-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_040-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_041-GmA01041-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_042-GmA01042-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_043-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_044-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_045-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_046-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_047-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_048-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_049-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_050-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_051-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_052-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_053-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_054-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_055-GmA01055-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_056-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_057-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_058-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_059-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_060-GmA01060-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_061-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_062-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_063-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_064-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_065-GmA01065-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_066-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_067-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_068-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_069-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_070-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_071-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_072-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_073-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_074-merged.rgfix	Gmi-AHam
+Gmi-AHam_075-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_076-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_077-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_078-GmA01078-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_079-GmA01079-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_080-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_081-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_082-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_083-GmA01083-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_084-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_086-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_087-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_088-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_089-GmA01089-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-AHam
+Gmi-AHam_090-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_091-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_092-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_093-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_094-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_095-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-AHam_096-Ex1-cssl.clmp.fp2-repr	Gmi-AHam
+Gmi-CBas_001-GmC02001-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_002-GmC02002-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_003-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_004-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_005-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_006-merged.rgfix	Gmi-CBas
+Gmi-CBas_007-merged.rgfix	Gmi-CBas
+Gmi-CBas_008-GmC02008-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_009-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_010-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_011-GmC02011-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_012-merged.rgfix	Gmi-CBas
+Gmi-CBas_013-merged.rgfix	Gmi-CBas
+Gmi-CBas_014-merged.rgfix	Gmi-CBas
+Gmi-CBas_015-merged.rgfix	Gmi-CBas
+Gmi-CBas_016-merged.rgfix	Gmi-CBas
+Gmi-CBas_017-merged.rgfix	Gmi-CBas
+Gmi-CBas_018-GmC02018-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_019-merged.rgfix	Gmi-CBas
+Gmi-CBas_020-GmC02020-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_021-GmC02021-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_022-GmC02022-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_023-merged.rgfix	Gmi-CBas
+Gmi-CBas_024-merged.rgfix	Gmi-CBas
+Gmi-CBas_025-GmC02025-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_026-merged.rgfix	Gmi-CBas
+Gmi-CBas_027-merged.rgfix	Gmi-CBas
+Gmi-CBas_028-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_029-merged.rgfix	Gmi-CBas
+Gmi-CBas_031-GmC02031-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_033-merged.rgfix	Gmi-CBas
+Gmi-CBas_034-merged.rgfix	Gmi-CBas
+Gmi-CBas_035-GmC02035-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_036-GmC02036-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_038-GmC02038-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_039-merged.rgfix	Gmi-CBas
+Gmi-CBas_041-merged.rgfix	Gmi-CBas
+Gmi-CBas_043-GmC02043-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_044-GmC02044-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_045-Ex1-cssl2.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_046-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_047-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_048-merged.rgfix	Gmi-CBas
+Gmi-CBas_049-merged.rgfix	Gmi-CBas
+Gmi-CBas_050-GmC02050-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_051-GmC02052-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_053-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_054-merged.rgfix	Gmi-CBas
+Gmi-CBas_055-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_056-GmC02056-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_057-merged.rgfix	Gmi-CBas
+Gmi-CBas_058-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_059-GmC02059-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_060-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_061-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_063-GmC02063-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_064-merged.rgfix	Gmi-CBas
+Gmi-CBas_066-merged.rgfix	Gmi-CBas
+Gmi-CBas_067-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_068-merged.rgfix	Gmi-CBas
+Gmi-CBas_069-merged.rgfix	Gmi-CBas
+Gmi-CBas_070-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_071-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_072-GmC02072-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_075-merged.rgfix	Gmi-CBas
+Gmi-CBas_077-GmC02077-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_078-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_079-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_080-merged.rgfix	Gmi-CBas
+Gmi-CBas_081-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_082-merged.rgfix	Gmi-CBas
+Gmi-CBas_083-merged.rgfix	Gmi-CBas
+Gmi-CBas_084-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_085-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_086-merged.rgfix	Gmi-CBas
+Gmi-CBas_087-GmC02087-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBas
+Gmi-CBas_088-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_089-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_090-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_091-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_092-merged.rgfix	Gmi-CBas
+Gmi-CBas_093-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_094-Ex1-cssl.clmp.fp2-repr	Gmi-CBas
+Gmi-CBas_095-merged.rgfix	Gmi-CBas
+Gmi-CBat_001-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_002-merged.rgfix	Gmi-CBat
+Gmi-CBat_003-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_004-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_005-merged.rgfix	Gmi-CBat
+Gmi-CBat_006-GmC01006-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_008-GmC01008-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_009-GmC01009-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_010-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_011-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_012-merged.rgfix	Gmi-CBat
+Gmi-CBat_013-merged.rgfix	Gmi-CBat
+Gmi-CBat_014-GmC01014-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_015-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_016-GmC01016-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_017-GmC01017-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_018-merged.rgfix	Gmi-CBat
+Gmi-CBat_019-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_020-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_021-merged.rgfix	Gmi-CBat
+Gmi-CBat_022-merged.rgfix	Gmi-CBat
+Gmi-CBat_023-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_024-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_025-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_026-GmC01026-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_027-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_028-GmC01028-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_029-GmC01029-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_030-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_031-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_032-GmC01032-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_033-GmC01033-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_034-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_035-merged.rgfix	Gmi-CBat
+Gmi-CBat_036-merged.rgfix	Gmi-CBat
+Gmi-CBat_037-merged.rgfix	Gmi-CBat
+Gmi-CBat_038-GmC01038-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_039-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_040-merged.rgfix	Gmi-CBat
+Gmi-CBat_041-GmC01041-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_042-merged.rgfix	Gmi-CBat
+Gmi-CBat_043-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_044-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_045-GmC01045-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_046-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_047-merged.rgfix	Gmi-CBat
+Gmi-CBat_048-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_049-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_050-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_051-merged.rgfix	Gmi-CBat
+Gmi-CBat_052-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_053-GmC01053-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_054-GmC01054-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_056-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_057-GmC01057-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_058-merged.rgfix	Gmi-CBat
+Gmi-CBat_059-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_060-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_061-merged.rgfix	Gmi-CBat
+Gmi-CBat_062-merged.rgfix	Gmi-CBat
+Gmi-CBat_063-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_064-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_065-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_066-merged.rgfix	Gmi-CBat
+Gmi-CBat_067-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_068-GmC01068-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_069-GmC01069-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_070-merged.rgfix	Gmi-CBat
+Gmi-CBat_071-merged.rgfix	Gmi-CBat
+Gmi-CBat_072-GmC01072-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_073-GmC01073-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_074-GmC01074-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_075-GmC01075-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_076-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_077-GmC01077-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_078-GmC01078-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_079-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_080-merged.rgfix	Gmi-CBat
+Gmi-CBat_081-merged.rgfix	Gmi-CBat
+Gmi-CBat_082-merged.rgfix	Gmi-CBat
+Gmi-CBat_083-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_084-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_085-GmC01085-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_086-GmC01086-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_087-GmC01087-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_088-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_089-GmC01089-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_090-GmC01090-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_091-Ex1-cssl.clmp.fp2-repr	Gmi-CBat
+Gmi-CBat_092-GmC01092-L1-fp1-clmp-fp2-fqscrn-repr	Gmi-CBat
+Gmi-CBat_093-merged.rgfix	Gmi-CBat
+Gmi-CBat_094-merged.rgfix	Gmi-CBat
+Gmi-CBat_095-merged.rgfix	Gmi-CBat
+Gmi-CBat_096-merged.rgfix	Gmi-CBat
+
+ Tue Nov 21 13:07:31 EST 2023  Genotyping individuals of ploidy 2 using freebayes...
+
+  Wed Nov 22 09:59:40 EST 2023 Cleaning up files...
+
+ Wed Nov 22 10:10:23 EST 2023 Assembling final VCF file...
+
+Compress large filesThu Nov 23 00:58:58 EST 2023
