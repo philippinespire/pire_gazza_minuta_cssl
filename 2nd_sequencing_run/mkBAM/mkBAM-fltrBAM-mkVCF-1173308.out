@@ -1,0 +1,4739 @@
+
+
+
+* dDocentHPC v4.5 Forked by cbird@tamucc.edu * 
+
+
+Running dDocentHPC mkBAM...
+ 
+Wed Nov 30 10:18:59 EST 2022 Files output to:  /home/e1garcia/shotgun_PIRE/pire_cssl_data_processing/gazza_minuta/2nd_sequencing_run/mkBAM
+
+Wed Nov 30 10:18:59 EST 2022 Reading config file... 
+ 
+Settings for dDocentHPC
+#Made in notepad++, use for best viewing
+
+These default settings assume ddRAD, no overlapping 151 bp reads
+
+40              Number of Processors (Auto, 1, 2, 3, ..., n threads) cbirdq=40 normal=20
+230G    Maximum Memory (1G,2G,..., 256G)  G=gigabytes
+
+----------trimFQ: Settings for Trimming FASTQ Files---------------------------------------------------------------
+146             trimmomatic MINLEN (integer, mkREF only)                                                Drop the read if it is below a specified length. Set to the length of the Read1 reads.
+75              trimmomatic MINLEN (integer, mkBAM only)                                                Drop the read if it is below a specified length. Set to the minimum frag length you want mapped to the reference.
+20              trimmomatic LEADING:<quality> (integer, mkBAM only)                             Specifies the minimum quality required to keep a base.
+15              trimmomatic TRAILING:<quality> (integer, mkREF only)                    Specifies the minimum quality required to keep a base.
+20              trimmomatic TRAILING:<quality> (integer, mkBAM only)                    Specifies the minimum quality required to keep a base.
+TruSeq3-PE-2.fa trimmomatic ILLUMINACLIP:<fasta> (0, fasta file name)                   Specifies the trimmomatic adapter file to use. entering a 0 (zero) will turn off adapter trimming. Options are: TruSeq3-PE-2.fa, TruSeq3-PE.fa, TruSeq3-SE.fa, TruSeq2-PE.fa, TruSeq2-SE.fa, any other files included with trimmomatic.  Entering a custom path here will break the script. If you want a customized file, you have to put it where the default trimmomatic files are located on your computer.  If you have trouble finding this location, run dDocentHPC trimREF and it will be included in the output.
+2               trimmomatic ILLUMINACLIP:<seed mismatches> (integer)                    specifies the maximum mismatch count which will still allow a full match to be performed
+30              trimmomatic ILLUMINACLIP:<palindrome clip thresh> (integer)             specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment
+10              trimmomatic ILLUMINACLIP:<simple clip thresh> (integer)                 specifies how accurate the match between any adapter etc. sequence must be against a read.
+20              trimmomatic SLIDINGWINDOW:<windowSize> (integer)                                specifies the number of bases to average across
+20              trimmomatic SLIDINGWINDOW:<windowQuality> (integer)                             specifies the average quality required.
+0               trimmomatic CROP:<bp to keep> (integer, mkBAM only)    Trim read sequences down to this length. Enter 0 for no cropping
+0               trimmomatic HEADCROP:<length> (integer, only Read1 for ezRAD)   The number of bases to remove from the start of the read. 0 for ddRAD, 5 for ezRAD
+no              FixStacks (yes,no)                                                                                      Demultiplexing with stacks introduces anomolies.  This removes them.
+------------------------------------------------------------------------------------------------------------------
+
+----------mkREF: Settings for de novo assembly of the reference genome--------------------------------------------
+PE              Type of reads for assembly (PE, SE, OL, RPE)                                    PE=ddRAD & ezRAD pairedend, non-overlapping reads; SE=singleend reads; OL=ddRAD & ezRAD overlapping reads, miseq; RPE=oregonRAD, restriction site + random shear
+0.9             cdhit Clustering_Similarity_Pct (0-1)                                                   Use cdhit to cluster and collapse uniq reads by similarity threshold
+rad               Cutoff1 (integer)                                                                                         Use unique reads that have at least this much coverage for making the reference     genome
+RAW-10-10               Cutoff2 (integer)
+                Use unique reads that occur in at least this many individuals for making the reference genome
+0.05    rainbow merge -r <percentile> (decimal 0-1)                                             Percentile-based minimum number of seqs to assemble in a precluster
+0.95    rainbow merge -R <percentile> (decimal 0-1)                                             Percentile-based maximum number of seqs to assemble in a precluster
+------------------------------------------------------------------------------------------------------------------
+
+----------mkBAM: Settings for mapping the reads to the reference genome-------------------------------------------
+Make sure the cutoffs above match the reference*fasta!
+1               bwa mem -A Mapping_Match_Value (integer)
+4               bwa mem -B Mapping_MisMatch_Value (integer)
+6               bwa mem -O Mapping_GapOpen_Penalty (integer)
+30              bwa mem -T Mapping_Minimum_Alignment_Score (integer)                    Remove reads that have an alignment score less than this.
+5       bwa mem -L Mapping_Clipping_Penalty (integer,integer)
+------------------------------------------------------------------------------------------------------------------
+
+----------fltrBAM: Settings for filtering mapping alignments in the *bam files---------------
+20              samtools view -q        Mapping_Min_Quality (integer)                   Remove reads with mapping qual less than this value
+yes             samtools view -F 4      Remove_unmapped_reads? (yes,no)                 Since the reads aren't mapped, we generally don't need to filter them
+no              samtools view -F 8      Remove_read_pair_if_one_is_unmapped? (yes,no)   If either read in a pair does not map, then the other is also removed
+yes             samtools view -F 256    Remove_secondary_alignments? (yes,no)           Secondary alignments are reads that also map to other contigs in the reference genome
+no              samtools view -F 512    Remove_reads_not_passing_platform_vendor_filters (yes,no)               We generally don't see any of these
+no              samtools view -F 1024   Remove_PCR_or_optical_duplicates? (yes,no)      You probably don't want to set this to yes
+no              samtools view -F 2048   Remove_supplementary_alignments? (yes,no)       We generally don't see any of these
+no              samtools view -f 2      Keep_only_properly_aligned_read_pairs? (yes,no)                         Set to no if OL mode
+0               samtools view -F        Custom_samtools_view_F_bit_value? (integer)                             performed separately from the above, consult samtools man
+0               samtools view -f        Custom_samtools_view_f_bit_value? (integer)                             performed separately from the above, consult samtools man
+30                                      Remove_reads_with_excessive_soft_clipping? (no, integers by 10s)        minimum number of soft clipped bases in a read that is unacceptable
+30                                      Remove_reads_with_alignment_score_below (integer)               Should match bwa mem -T, which sometimes doesn't work
+no                                      Remove_reads_orphaned_by_filters? (yes,no)
+------------------------------------------------------------------------------------------------------------------
+
+----------mkVCF: Settings for variant calling/ genotyping---------------------------------------------------------
+no      freebayes -J --pooled-discrete (yes|no)                         If yes, a pool of individuals is assumed to be the statistical unit of observation.
+no      freebayes -A --cnv-map (filename.bed or no)                     If the pools have different numbers of individuals, then you should provide a copy number variation (cnv) *.bed file with the "ploidy" of each pool. the bed file should be in the working directory and formatted as follows: popmap_column_1 ploidy_of_pool.  If that doesn't work, try the basenames of the files in popmap column 1.
+2       freebayes -p --ploidy (integer)                                 Whether pooled or not, if no cnv-map file is provided, then what is the ploidy of the samples? for pools, this number should be the number of individuals * ploidy
+no      freebayes -r --region (filename.bed or no)                      Limit analysis to specified region.  Bed file format: <chrom>:<start_position>-<end_position>
+0       only genotype read 1 (integer)                                  Limit analysis to only Read 1 positions, integer is maximum Read1 bp position
+0       Minimum Mean Depth of Coverage Per Individual                   Limit analysis to contigs with at least the specified mean depth of coverage per individual
+0       freebayes -n --use-best-n-alleles (integer)                     reduce the number of alleles considered to n, zero means all, set to 2 or more if you run out of memory
+30      freebayes -m --min-mapping-quality (integer)
+20      freebayes -q --min-base-quality (integer)
+-1      freebayes -E --haplotype-length (-1, 3, or integer)             Set to -1 to avoid multi nucleotide polymorphisms and force calling MNPs as SNPs.  Can be set up to half the read length, or more.
+0       freebayes    --min-repeat-entropy (0, 1, or integer)            Set to 0 to avoid multi nucleotide polymorphisms and force calling MNPs as SNPs. To detect interrupted repeats, build across sequence until it has entropy > N bits per bp.
+10      freebayes    --min-coverage (integer)                           Require at least this coverage to process a site
+0.375   freebayes -F --min-alternate-fraction (decimal 0-1)             There must be at least 1 individual with this fraction of alt reads to evaluate the position. If your individuals are barcoded, then use 0.2. If your data is pooled, then set based upon ~ 1/(numIndivids * ploidy) and average depth of coverage
+2       freebayes -C --min-alternate-count (integer)                    Require at least this count of observations supporting an alternate allele within a single individual in order to evaluate the position.  default: 2
+10      freebayes -G --min-alternate-total (integer)                    Require at least this count of observations supporting an alternate allele within the total population in order to use the allele in analysis.  default: 1
+0.33    freebayes -z --read-max-mismatch-fraction (decimal 0-1)         Exclude reads with more than N [0,1] fraction of mismatches where each mismatch has base quality >= mismatch-base-quality-threshold default: 1.0
+20      freebayes -Q --mismatch-base-quality-threshold (integer)        Count mismatches toward --read-mismatch-limit if the base quality of the mismatch is >= Q.  default: 10
+50      freebayes -U --read-mismatch-limit (integer)                    Exclude reads with more than N mismatches where each mismatch has base quality >= mismatch-base-quality-threshold. default: ~unbounded
+20      freebayes ~3 ~~min-alternate-qsum (integer)                     This value is the mean base quality score for alternate reads and will be multiplied by -C to set -3. Description of -3: Require at least this count of observations supporting an alternate allele within a single individual in order to evaluate the position.  default: 2
+50      freebayes -$ --read-snp-limit (integer)                         Exclude reads with more than N base mismatches, ignoring gaps with quality >= mismatch-base-quality-threshold. default: ~unbounded
+20      freebayes -e --read-indel-limit (integer)                       Exclude reads with more than N separate gaps. default: ~unbounded
+no      freebayes -w --hwe-priors-off (no|yes)                          Disable estimation of the probability of the combination arising under HWE given the allele frequency as estimated by observation frequency.
+no      freebayes -V --binomial-obs-priors-off (no|yes)                 Disable incorporation of prior expectations about observations. Uses read placement probability, strand balance probability, and read position (5'-3') probability.
+no      freebayes -a --allele-balance-priors-off (no|yes)               Disable use of aggregate probability of observation balance between alleles as a component of the priors.
+no      freebayes    --no-partial-observations (no|yes)                 Exclude observations which do not fully span the dynamically-determined detection window.  (default, use all observations, dividing partial support across matching haplotypes when generating haplotypes.)
+no      freebayes    --report-monomorphic (no|yes)                      Report even loci which appear to be monomorphic, and report allconsidered alleles, even those which are not in called genotypes. Loci which do not have any potential alternates have '.' for ALT.
+
+------------------------------------------------------------------------------------------------------------------
+
+
+Email
+user@tamucc.edu
+
+Wed Nov 30 10:18:59 EST 2022 Reading in variables from config file...
+
+Wed Nov 30 10:18:59 EST 2022 Checking for all required dDocent software...
+
+ Running CheckDependencies Function...
+
+  The dependency trimmomatic is installed!
+
+  The dependency freebayes is installed!
+
+  The dependency mawk is installed!
+
+  The dependency bwa is installed!
+
+  The dependency samtools is installed!
+
+  The dependency vcftools is installed!
+
+  The dependency rainbow is installed!
+
+  The dependency gnuplot is installed!
+
+  The dependency gawk is installed!
+
+  The dependency seqtk is installed!
+
+  The dependency cd-hit-est is installed!
+
+  The dependency bamToBed is installed!
+
+  The dependency bedtools is installed!
+
+  The dependency coverageBed is installed!
+
+  The dependency parallel is installed!
+
+  The dependency vcfcombine is installed!
+
+  The dependency bamtools is installed!
+
+  The dependency pearRM is installed!
+
+ All dependencies are installed and up to date!
+
+
+Wed Nov 30 10:19:00 EST 2022  Begin main ddocent function
+
+ The HPC version of dDocent will only digest files with particular extensions for particular tasks
+  untouched files for trimming must be *.F.fq.gz and *.R.fq.gz
+  files trimmed for assembly (mkREF) must be *r1.fq.gz *r2.fq.gz
+  files trimmed for mapping (mkBAM) must be *R1.fq.gz *R2.fq.gz
+
+  extensions selected: *.R1.fq.gz *.R2.fq.gz
+ 
+ The samples being processed are:
+  Gmi-ABas_001-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_004-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_008-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_009-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_010-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_011-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_012-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_013-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_014-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_015-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_016-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_017-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_018-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_019-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_022-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_024-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_025-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_026-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_027-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_028-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_029-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_030-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_031-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_032-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_033-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_034-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_035-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_036-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_037-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_038-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_039-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_040-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_041-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_042-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_043-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_045-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_046-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_047-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_048-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_049-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_050-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_051-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_052-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_053-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_055-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_056-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_057-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_058-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_059-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_060-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_061-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-AHam_001-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_002-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_005-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_006-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_007-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_008-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_009-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_012-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_013-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_015-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_016-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_019-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_020-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_021-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_022-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_023-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_024-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_025-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_034-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_036-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_038-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_040-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_043-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_044-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_045-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_046-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_047-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_048-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_049-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_050-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_051-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_052-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_053-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_054-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_056-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_057-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_058-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_059-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_061-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_062-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_063-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_064-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_066-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_067-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_068-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_069-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_070-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_071-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_072-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_073-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_074-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_075-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_076-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_077-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_080-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_081-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_082-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_084-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_086-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_087-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_088-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_090-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_091-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_092-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_093-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_094-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_095-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_096-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_003-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_004-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_005-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_006-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_007-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_009-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_010-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_012-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_013-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_014-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_015-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_016-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_017-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_019-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_023-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_024-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_026-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_027-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_028-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_029-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_033-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_034-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_039-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_041-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_045-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_046-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_047-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_048-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_049-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_053-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_054-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_055-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_057-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_058-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_060-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_061-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_064-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_066-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_067-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_068-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_069-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_070-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_071-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_075-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_078-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_079-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_080-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_081-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_082-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_083-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_084-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_085-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_086-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_088-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_089-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_090-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_091-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_092-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_093-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_094-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_095-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_001-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_002-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_003-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_004-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_005-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_010-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_011-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_012-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_013-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_015-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_018-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_019-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_020-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_021-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_022-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_023-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_024-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_025-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_027-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_030-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_031-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_034-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_035-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_036-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_037-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_039-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_040-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_042-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_043-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_044-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_046-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_047-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_048-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_049-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_050-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_051-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_052-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_056-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_058-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_059-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_060-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_061-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_062-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_063-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_064-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_065-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_066-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_067-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_070-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_071-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_076-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_079-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_080-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_081-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_082-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_083-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_084-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_088-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_091-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_093-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_094-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_095-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_096-Ex1-cssl2.clmp.fp2_repr
+
+ 
+Wed Nov 30 10:19:02 EST 2022  Using BWA to map reads.
+
+Wed Nov 30 10:19:15 EST 2022  was ref assembled by dDocent? Yes. Modifying expected insert length for bwa
+
+Wed Nov 30 10:19:17 EST 2022  Run bwa mem on dDocent files
+FILE=Gmi-ABas_014-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:20:35 EST 2022  run samtools sort Gmi-ABas_014-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:20:40 EST 2022  run samtools index Gmi-ABas_014-Ex1-b-cssl.clmp.fp2_repr
+FILE=Gmi-ABas_004-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:24:15 EST 2022  run samtools sort Gmi-ABas_004-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:24:43 EST 2022  run samtools index Gmi-ABas_004-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-ABas_013-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:26:15 EST 2022  run samtools sort Gmi-ABas_013-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:26:51 EST 2022  run samtools index Gmi-ABas_013-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-ABas_011-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:26:18 EST 2022  run samtools sort Gmi-ABas_011-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:26:54 EST 2022  run samtools index Gmi-ABas_011-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-ABas_025-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:26:46 EST 2022  run samtools sort Gmi-ABas_025-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:27:24 EST 2022  run samtools index Gmi-ABas_025-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-ABas_001-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:27:07 EST 2022  run samtools sort Gmi-ABas_001-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:27:47 EST 2022  run samtools index Gmi-ABas_001-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:27:10 EST 2022  run samtools sort Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:27:53 EST 2022  run samtools index Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-ABas_019-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:27:50 EST 2022  run samtools sort Gmi-ABas_019-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:28:40 EST 2022  run samtools index Gmi-ABas_019-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_024-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:27:57 EST 2022  run samtools sort Gmi-ABas_024-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:28:50 EST 2022  run samtools index Gmi-ABas_024-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_030-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:28:24 EST 2022  run samtools sort Gmi-ABas_030-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:29:15 EST 2022  run samtools index Gmi-ABas_030-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_039-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:28:27 EST 2022  run samtools sort Gmi-ABas_039-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:29:20 EST 2022  run samtools index Gmi-ABas_039-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_034-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:28:40 EST 2022  run samtools sort Gmi-ABas_034-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:29:35 EST 2022  run samtools index Gmi-ABas_034-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_032-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:28:57 EST 2022  run samtools sort Gmi-ABas_032-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:29:56 EST 2022  run samtools index Gmi-ABas_032-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_017-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:01 EST 2022  run samtools sort Gmi-ABas_017-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:30:01 EST 2022  run samtools index Gmi-ABas_017-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_009-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:06 EST 2022  run samtools sort Gmi-ABas_009-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:30:07 EST 2022  run samtools index Gmi-ABas_009-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_029-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:15 EST 2022  run samtools sort Gmi-ABas_029-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:30:12 EST 2022  run samtools index Gmi-ABas_029-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_031-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:12 EST 2022  run samtools sort Gmi-ABas_031-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:30:13 EST 2022  run samtools index Gmi-ABas_031-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_035-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:23 EST 2022  run samtools sort Gmi-ABas_035-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:30:22 EST 2022  run samtools index Gmi-ABas_035-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_033-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:28 EST 2022  run samtools sort Gmi-ABas_033-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:30:26 EST 2022  run samtools index Gmi-ABas_033-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_015-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:34 EST 2022  run samtools sort Gmi-ABas_015-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:30:31 EST 2022  run samtools index Gmi-ABas_015-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_012-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:35 EST 2022  run samtools sort Gmi-ABas_012-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:30:42 EST 2022  run samtools index Gmi-ABas_012-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_022-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:38 EST 2022  run samtools sort Gmi-ABas_022-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:30:44 EST 2022  run samtools index Gmi-ABas_022-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_010-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:40 EST 2022  run samtools sort Gmi-ABas_010-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:30:46 EST 2022  run samtools index Gmi-ABas_010-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_048-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:29:50 EST 2022  run samtools sort Gmi-ABas_048-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:30:51 EST 2022  run samtools index Gmi-ABas_048-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_042-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:30:10 EST 2022  run samtools sort Gmi-ABas_042-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:31:15 EST 2022  run samtools index Gmi-ABas_042-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_043-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:30:10 EST 2022  run samtools sort Gmi-ABas_043-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:31:16 EST 2022  run samtools index Gmi-ABas_043-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_016-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:30:26 EST 2022  run samtools sort Gmi-ABas_016-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:31:31 EST 2022  run samtools index Gmi-ABas_016-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_026-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:30:50 EST 2022  run samtools sort Gmi-ABas_026-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:31:53 EST 2022  run samtools index Gmi-ABas_026-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_040-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:30:56 EST 2022  run samtools sort Gmi-ABas_040-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:32:03 EST 2022  run samtools index Gmi-ABas_040-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_047-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:30:58 EST 2022  run samtools sort Gmi-ABas_047-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:32:03 EST 2022  run samtools index Gmi-ABas_047-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_018-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:31:08 EST 2022  run samtools sort Gmi-ABas_018-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:32:11 EST 2022  run samtools index Gmi-ABas_018-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_038-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:31:18 EST 2022  run samtools sort Gmi-ABas_038-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:32:19 EST 2022  run samtools index Gmi-ABas_038-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_028-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:31:25 EST 2022  run samtools sort Gmi-ABas_028-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:32:24 EST 2022  run samtools index Gmi-ABas_028-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_027-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:31:40 EST 2022  run samtools sort Gmi-ABas_027-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:32:42 EST 2022  run samtools index Gmi-ABas_027-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_036-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:31:46 EST 2022  run samtools sort Gmi-ABas_036-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:32:46 EST 2022  run samtools index Gmi-ABas_036-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_041-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:32:40 EST 2022  run samtools sort Gmi-ABas_041-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:33:51 EST 2022  run samtools index Gmi-ABas_041-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-ABas_046-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:34:12 EST 2022  run samtools sort Gmi-ABas_046-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:35:28 EST 2022  run samtools index Gmi-ABas_046-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-ABas_037-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:34:24 EST 2022  run samtools sort Gmi-ABas_037-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:35:43 EST 2022  run samtools index Gmi-ABas_037-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-ABas_008-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:35:31 EST 2022  run samtools sort Gmi-ABas_008-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:37:20 EST 2022  run samtools index Gmi-ABas_008-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-AHam_015-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:39:52 EST 2022  run samtools sort Gmi-AHam_015-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:40:51 EST 2022  run samtools index Gmi-AHam_015-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_058-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:40:26 EST 2022  run samtools sort Gmi-ABas_058-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:41:30 EST 2022  run samtools index Gmi-ABas_058-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_061-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:40:32 EST 2022  run samtools sort Gmi-ABas_061-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:41:33 EST 2022  run samtools index Gmi-ABas_061-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_059-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:41:12 EST 2022  run samtools sort Gmi-ABas_059-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:42:17 EST 2022  run samtools index Gmi-ABas_059-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_060-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:41:11 EST 2022  run samtools sort Gmi-ABas_060-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:42:17 EST 2022  run samtools index Gmi-ABas_060-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_050-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:40:55 EST 2022  run samtools sort Gmi-ABas_050-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:42:20 EST 2022  run samtools index Gmi-ABas_050-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-ABas_051-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:42:18 EST 2022  run samtools sort Gmi-ABas_051-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:43:38 EST 2022  run samtools index Gmi-ABas_051-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-ABas_045-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:41:15 EST 2022  run samtools sort Gmi-ABas_045-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:43:47 EST 2022  run samtools index Gmi-ABas_045-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-ABas_052-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:42:58 EST 2022  run samtools sort Gmi-ABas_052-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:44:19 EST 2022  run samtools index Gmi-ABas_052-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_001-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:44:03 EST 2022  run samtools sort Gmi-AHam_001-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:45:19 EST 2022  run samtools index Gmi-AHam_001-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-ABas_056-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:44:06 EST 2022  run samtools sort Gmi-ABas_056-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:45:33 EST 2022  run samtools index Gmi-ABas_056-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_038-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:44:54 EST 2022  run samtools sort Gmi-AHam_038-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:46:02 EST 2022  run samtools index Gmi-AHam_038-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-ABas_057-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:44:47 EST 2022  run samtools sort Gmi-ABas_057-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:46:10 EST 2022  run samtools index Gmi-ABas_057-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-ABas_055-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:45:08 EST 2022  run samtools sort Gmi-ABas_055-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:46:48 EST 2022  run samtools index Gmi-ABas_055-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-AHam_013-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:47:03 EST 2022  run samtools sort Gmi-AHam_013-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:48:31 EST 2022  run samtools index Gmi-AHam_013-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_005-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:47:03 EST 2022  run samtools sort Gmi-AHam_005-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:48:33 EST 2022  run samtools index Gmi-AHam_005-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_002-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:47:27 EST 2022  run samtools sort Gmi-AHam_002-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:48:54 EST 2022  run samtools index Gmi-AHam_002-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_025-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:48:27 EST 2022  run samtools sort Gmi-AHam_025-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:49:57 EST 2022  run samtools index Gmi-AHam_025-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_016-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:48:06 EST 2022  run samtools sort Gmi-AHam_016-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:49:58 EST 2022  run samtools index Gmi-AHam_016-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-ABas_053-Ex1-b-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:48:43 EST 2022  run samtools sort Gmi-ABas_053-Ex1-b-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:50:33 EST 2022  run samtools index Gmi-ABas_053-Ex1-b-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-AHam_022-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:49:30 EST 2022  run samtools sort Gmi-AHam_022-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:51:12 EST 2022  run samtools index Gmi-AHam_022-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-ABas_049-Ex1-b-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:48:43 EST 2022  run samtools sort Gmi-ABas_049-Ex1-b-cssl2.clmp.fp2_repr
+
+Wed Nov 30 10:52:05 EST 2022  run samtools index Gmi-ABas_049-Ex1-b-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-AHam_023-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:51:58 EST 2022  run samtools sort Gmi-AHam_023-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:53:44 EST 2022  run samtools index Gmi-AHam_023-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-AHam_019-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:54:02 EST 2022  run samtools sort Gmi-AHam_019-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:56:07 EST 2022  run samtools index Gmi-AHam_019-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-AHam_006-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:54:27 EST 2022  run samtools sort Gmi-AHam_006-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:57:12 EST 2022  run samtools index Gmi-AHam_006-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-AHam_043-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:55:05 EST 2022  run samtools sort Gmi-AHam_043-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:57:15 EST 2022  run samtools index Gmi-AHam_043-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-AHam_036-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:55:01 EST 2022  run samtools sort Gmi-AHam_036-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:57:22 EST 2022  run samtools index Gmi-AHam_036-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_052-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:57:17 EST 2022  run samtools sort Gmi-AHam_052-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:58:35 EST 2022  run samtools index Gmi-AHam_052-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_012-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:57:21 EST 2022  run samtools sort Gmi-AHam_012-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:59:39 EST 2022  run samtools index Gmi-AHam_012-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-AHam_009-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:57:03 EST 2022  run samtools sort Gmi-AHam_009-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:59:41 EST 2022  run samtools index Gmi-AHam_009-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_053-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:58:20 EST 2022  run samtools sort Gmi-AHam_053-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 10:59:58 EST 2022  run samtools index Gmi-AHam_053-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-AHam_050-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:59:00 EST 2022  run samtools sort Gmi-AHam_050-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:00:29 EST 2022  run samtools index Gmi-AHam_050-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_021-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 10:58:36 EST 2022  run samtools sort Gmi-AHam_021-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:01:03 EST 2022  run samtools index Gmi-AHam_021-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_020-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:00:04 EST 2022  run samtools sort Gmi-AHam_020-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:02:42 EST 2022  run samtools index Gmi-AHam_020-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_054-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:01:25 EST 2022  run samtools sort Gmi-AHam_054-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:02:52 EST 2022  run samtools index Gmi-AHam_054-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_062-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:01:44 EST 2022  run samtools sort Gmi-AHam_062-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:03:06 EST 2022  run samtools index Gmi-AHam_062-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_049-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:01:25 EST 2022  run samtools sort Gmi-AHam_049-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:03:45 EST 2022  run samtools index Gmi-AHam_049-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_008-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:01:26 EST 2022  run samtools sort Gmi-AHam_008-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:04:46 EST 2022  run samtools index Gmi-AHam_008-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-AHam_034-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:01:28 EST 2022  run samtools sort Gmi-AHam_034-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:04:50 EST 2022  run samtools index Gmi-AHam_034-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-AHam_044-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:03:27 EST 2022  run samtools sort Gmi-AHam_044-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:06:37 EST 2022  run samtools index Gmi-AHam_044-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-AHam_071-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:06:33 EST 2022  run samtools sort Gmi-AHam_071-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:07:54 EST 2022  run samtools index Gmi-AHam_071-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_024-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:04:15 EST 2022  run samtools sort Gmi-AHam_024-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:07:47 EST 2022  run samtools index Gmi-AHam_024-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-AHam_074-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:08:10 EST 2022  run samtools sort Gmi-AHam_074-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:09:31 EST 2022  run samtools index Gmi-AHam_074-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_056-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:07:26 EST 2022  run samtools sort Gmi-AHam_056-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:09:53 EST 2022  run samtools index Gmi-AHam_056-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_040-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:06:41 EST 2022  run samtools sort Gmi-AHam_040-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:10:19 EST 2022  run samtools index Gmi-AHam_040-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-CBas_003-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:10:52 EST 2022  run samtools sort Gmi-CBas_003-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:11:02 EST 2022  run samtools index Gmi-CBas_003-Ex1-cssl.clmp.fp2_repr
+FILE=Gmi-AHam_051-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:08:10 EST 2022  run samtools sort Gmi-AHam_051-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:10:49 EST 2022  run samtools index Gmi-AHam_051-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_066-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:10:34 EST 2022  run samtools sort Gmi-AHam_066-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:12:50 EST 2022  run samtools index Gmi-AHam_066-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-AHam_063-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:10:22 EST 2022  run samtools sort Gmi-AHam_063-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:12:54 EST 2022  run samtools index Gmi-AHam_063-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_073-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:12:07 EST 2022  run samtools sort Gmi-AHam_073-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:14:16 EST 2022  run samtools index Gmi-AHam_073-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-AHam_007-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:09:37 EST 2022  run samtools sort Gmi-AHam_007-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:14:03 EST 2022  run samtools index Gmi-AHam_007-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 11 files and 1 in-memory blocks...
+FILE=Gmi-AHam_046-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:10:36 EST 2022  run samtools sort Gmi-AHam_046-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:14:14 EST 2022  run samtools index Gmi-AHam_046-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-AHam_047-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:10:37 EST 2022  run samtools sort Gmi-AHam_047-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:14:22 EST 2022  run samtools index Gmi-AHam_047-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-AHam_058-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:12:17 EST 2022  run samtools sort Gmi-AHam_058-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:15:10 EST 2022  run samtools index Gmi-AHam_058-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-AHam_061-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:12:37 EST 2022  run samtools sort Gmi-AHam_061-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:15:40 EST 2022  run samtools index Gmi-AHam_061-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-AHam_059-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:13:29 EST 2022  run samtools sort Gmi-AHam_059-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:16:44 EST 2022  run samtools index Gmi-AHam_059-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-AHam_064-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:14:23 EST 2022  run samtools sort Gmi-AHam_064-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:16:57 EST 2022  run samtools index Gmi-AHam_064-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBas_006-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:19:17 EST 2022  run samtools sort Gmi-CBas_006-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:19:59 EST 2022  run samtools index Gmi-CBas_006-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBas_004-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:20:09 EST 2022  run samtools sort Gmi-CBas_004-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:21:09 EST 2022  run samtools index Gmi-CBas_004-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-AHam_048-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:16:54 EST 2022  run samtools sort Gmi-AHam_048-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:21:05 EST 2022  run samtools index Gmi-AHam_048-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 11 files and 1 in-memory blocks...
+FILE=Gmi-AHam_069-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:18:14 EST 2022  run samtools sort Gmi-AHam_069-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:21:28 EST 2022  run samtools index Gmi-AHam_069-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-AHam_070-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:19:47 EST 2022  run samtools sort Gmi-AHam_070-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:22:55 EST 2022  run samtools index Gmi-AHam_070-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-CBas_010-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:22:29 EST 2022  run samtools sort Gmi-CBas_010-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:23:18 EST 2022  run samtools index Gmi-CBas_010-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-AHam_068-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:19:36 EST 2022  run samtools sort Gmi-AHam_068-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:22:57 EST 2022  run samtools index Gmi-AHam_068-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-AHam_077-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:20:29 EST 2022  run samtools sort Gmi-AHam_077-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:23:07 EST 2022  run samtools index Gmi-AHam_077-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_091-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:22:02 EST 2022  run samtools sort Gmi-AHam_091-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:23:46 EST 2022  run samtools index Gmi-AHam_091-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBas_005-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:22:49 EST 2022  run samtools sort Gmi-CBas_005-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:23:54 EST 2022  run samtools index Gmi-CBas_005-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-AHam_045-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:19:23 EST 2022  run samtools sort Gmi-AHam_045-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:24:12 EST 2022  run samtools index Gmi-AHam_045-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 12 files and 1 in-memory blocks...
+FILE=Gmi-CBas_012-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:23:57 EST 2022  run samtools sort Gmi-CBas_012-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:24:58 EST 2022  run samtools index Gmi-CBas_012-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-AHam_081-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:22:21 EST 2022  run samtools sort Gmi-AHam_081-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:24:47 EST 2022  run samtools index Gmi-AHam_081-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_057-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:21:01 EST 2022  run samtools sort Gmi-AHam_057-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:24:57 EST 2022  run samtools index Gmi-AHam_057-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 10 files and 1 in-memory blocks...
+FILE=Gmi-AHam_090-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:23:23 EST 2022  run samtools sort Gmi-AHam_090-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:25:24 EST 2022  run samtools index Gmi-AHam_090-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-AHam_080-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:22:55 EST 2022  run samtools sort Gmi-AHam_080-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:25:45 EST 2022  run samtools index Gmi-AHam_080-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-CBas_014-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:25:30 EST 2022  run samtools sort Gmi-CBas_014-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:26:32 EST 2022  run samtools index Gmi-CBas_014-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-AHam_086-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:24:11 EST 2022  run samtools sort Gmi-AHam_086-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:26:41 EST 2022  run samtools index Gmi-AHam_086-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBas_013-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:26:07 EST 2022  run samtools sort Gmi-CBas_013-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:27:08 EST 2022  run samtools index Gmi-CBas_013-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-AHam_088-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:26:01 EST 2022  run samtools sort Gmi-AHam_088-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:28:27 EST 2022  run samtools index Gmi-AHam_088-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-AHam_082-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:25:55 EST 2022  run samtools sort Gmi-AHam_082-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:28:43 EST 2022  run samtools index Gmi-AHam_082-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-CBas_007-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:28:40 EST 2022  run samtools sort Gmi-CBas_007-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:30:07 EST 2022  run samtools index Gmi-CBas_007-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_084-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:27:25 EST 2022  run samtools sort Gmi-AHam_084-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:30:18 EST 2022  run samtools index Gmi-AHam_084-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-AHam_094-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:31:10 EST 2022  run samtools sort Gmi-AHam_094-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:33:48 EST 2022  run samtools index Gmi-AHam_094-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBas_009-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:32:41 EST 2022  run samtools sort Gmi-CBas_009-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:34:30 EST 2022  run samtools index Gmi-CBas_009-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBas_046-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:34:06 EST 2022  run samtools sort Gmi-CBas_046-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:34:55 EST 2022  run samtools index Gmi-CBas_046-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-AHam_075-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:31:07 EST 2022  run samtools sort Gmi-AHam_075-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:34:54 EST 2022  run samtools index Gmi-AHam_075-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-CBas_024-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:34:29 EST 2022  run samtools sort Gmi-CBas_024-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:35:59 EST 2022  run samtools index Gmi-CBas_024-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBas_047-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:35:37 EST 2022  run samtools sort Gmi-CBas_047-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:36:43 EST 2022  run samtools index Gmi-CBas_047-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_057-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:36:11 EST 2022  run samtools sort Gmi-CBas_057-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:37:04 EST 2022  run samtools index Gmi-CBas_057-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_045-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:36:36 EST 2022  run samtools sort Gmi-CBas_045-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:37:40 EST 2022  run samtools index Gmi-CBas_045-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-AHam_096-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:34:39 EST 2022  run samtools sort Gmi-AHam_096-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:37:32 EST 2022  run samtools index Gmi-AHam_096-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-AHam_093-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:34:37 EST 2022  run samtools sort Gmi-AHam_093-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:37:56 EST 2022  run samtools index Gmi-AHam_093-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-AHam_076-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:34:06 EST 2022  run samtools sort Gmi-AHam_076-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:37:53 EST 2022  run samtools index Gmi-AHam_076-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-CBas_058-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:38:29 EST 2022  run samtools sort Gmi-CBas_058-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:39:30 EST 2022  run samtools index Gmi-CBas_058-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-AHam_072-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:34:45 EST 2022  run samtools sort Gmi-AHam_072-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:39:49 EST 2022  run samtools index Gmi-AHam_072-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 13 files and 1 in-memory blocks...
+FILE=Gmi-CBas_053-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:39:05 EST 2022  run samtools sort Gmi-CBas_053-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:40:07 EST 2022  run samtools index Gmi-CBas_053-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_060-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:39:24 EST 2022  run samtools sort Gmi-CBas_060-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:40:26 EST 2022  run samtools index Gmi-CBas_060-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_028-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:39:07 EST 2022  run samtools sort Gmi-CBas_028-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:40:34 EST 2022  run samtools index Gmi-CBas_028-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBas_033-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:39:20 EST 2022  run samtools sort Gmi-CBas_033-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:40:41 EST 2022  run samtools index Gmi-CBas_033-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_087-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:37:53 EST 2022  run samtools sort Gmi-AHam_087-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:41:35 EST 2022  run samtools index Gmi-AHam_087-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-CBas_066-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:41:47 EST 2022  run samtools sort Gmi-CBas_066-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:42:45 EST 2022  run samtools index Gmi-CBas_066-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_017-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:40:58 EST 2022  run samtools sort Gmi-CBas_017-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:43:09 EST 2022  run samtools index Gmi-CBas_017-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-CBas_055-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:41:58 EST 2022  run samtools sort Gmi-CBas_055-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:43:21 EST 2022  run samtools index Gmi-CBas_055-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBas_061-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:42:56 EST 2022  run samtools sort Gmi-CBas_061-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:44:04 EST 2022  run samtools index Gmi-CBas_061-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_067-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:43:06 EST 2022  run samtools sort Gmi-CBas_067-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:44:07 EST 2022  run samtools index Gmi-CBas_067-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_070-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:44:13 EST 2022  run samtools sort Gmi-CBas_070-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:44:57 EST 2022  run samtools index Gmi-CBas_070-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-AHam_067-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:39:32 EST 2022  run samtools sort Gmi-AHam_067-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:45:11 EST 2022  run samtools index Gmi-AHam_067-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 15 files and 1 in-memory blocks...
+FILE=Gmi-CBas_048-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:44:03 EST 2022  run samtools sort Gmi-CBas_048-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:45:38 EST 2022  run samtools index Gmi-CBas_048-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_095-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:41:43 EST 2022  run samtools sort Gmi-AHam_095-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:45:28 EST 2022  run samtools index Gmi-AHam_095-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-CBas_041-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:44:07 EST 2022  run samtools sort Gmi-CBas_041-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:45:53 EST 2022  run samtools index Gmi-CBas_041-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBas_026-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:45:06 EST 2022  run samtools sort Gmi-CBas_026-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:47:06 EST 2022  run samtools index Gmi-CBas_026-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBas_015-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:44:57 EST 2022  run samtools sort Gmi-CBas_015-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:47:31 EST 2022  run samtools index Gmi-CBas_015-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBas_084-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:47:13 EST 2022  run samtools sort Gmi-CBas_084-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:47:47 EST 2022  run samtools index Gmi-CBas_084-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBas_054-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:46:17 EST 2022  run samtools sort Gmi-CBas_054-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:48:01 EST 2022  run samtools index Gmi-CBas_054-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBas_086-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:48:39 EST 2022  run samtools sort Gmi-CBas_086-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:49:19 EST 2022  run samtools index Gmi-CBas_086-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBas_039-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:47:22 EST 2022  run samtools sort Gmi-CBas_039-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:49:19 EST 2022  run samtools index Gmi-CBas_039-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBas_090-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:50:01 EST 2022  run samtools sort Gmi-CBas_090-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:50:47 EST 2022  run samtools index Gmi-CBas_090-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBas_089-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:50:03 EST 2022  run samtools sort Gmi-CBas_089-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:50:47 EST 2022  run samtools index Gmi-CBas_089-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBat_001-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:51:07 EST 2022  run samtools sort Gmi-CBat_001-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:51:42 EST 2022  run samtools index Gmi-CBat_001-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBas_093-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:51:12 EST 2022  run samtools sort Gmi-CBas_093-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:51:48 EST 2022  run samtools index Gmi-CBas_093-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBas_071-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:50:30 EST 2022  run samtools sort Gmi-CBas_071-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:51:48 EST 2022  run samtools index Gmi-CBas_071-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-AHam_092-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:47:19 EST 2022  run samtools sort Gmi-AHam_092-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:52:12 EST 2022  run samtools index Gmi-AHam_092-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 13 files and 1 in-memory blocks...
+FILE=Gmi-CBas_019-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:49:39 EST 2022  run samtools sort Gmi-CBas_019-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:52:28 EST 2022  run samtools index Gmi-CBas_019-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBas_088-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:53:14 EST 2022  run samtools sort Gmi-CBas_088-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:54:21 EST 2022  run samtools index Gmi-CBas_088-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_023-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:51:17 EST 2022  run samtools sort Gmi-CBas_023-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:54:21 EST 2022  run samtools index Gmi-CBas_023-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-CBas_081-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:53:35 EST 2022  run samtools sort Gmi-CBas_081-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:55:00 EST 2022  run samtools index Gmi-CBas_081-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBas_078-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:53:35 EST 2022  run samtools sort Gmi-CBas_078-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:55:04 EST 2022  run samtools index Gmi-CBas_078-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBat_003-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:55:08 EST 2022  run samtools sort Gmi-CBat_003-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:55:51 EST 2022  run samtools index Gmi-CBat_003-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBas_091-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:54:52 EST 2022  run samtools sort Gmi-CBas_091-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:55:59 EST 2022  run samtools index Gmi-CBas_091-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_069-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:54:03 EST 2022  run samtools sort Gmi-CBas_069-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:55:54 EST 2022  run samtools index Gmi-CBas_069-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_002-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:55:16 EST 2022  run samtools sort Gmi-CBat_002-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:56:17 EST 2022  run samtools index Gmi-CBat_002-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_011-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:56:09 EST 2022  run samtools sort Gmi-CBat_011-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:56:49 EST 2022  run samtools index Gmi-CBat_011-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBas_094-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:55:45 EST 2022  run samtools sort Gmi-CBas_094-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:56:55 EST 2022  run samtools index Gmi-CBas_094-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_085-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:55:36 EST 2022  run samtools sort Gmi-CBas_085-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:57:00 EST 2022  run samtools index Gmi-CBas_085-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBas_083-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:55:58 EST 2022  run samtools sort Gmi-CBas_083-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:57:30 EST 2022  run samtools index Gmi-CBas_083-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBas_027-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:55:19 EST 2022  run samtools sort Gmi-CBas_027-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:58:06 EST 2022  run samtools index Gmi-CBas_027-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBas_016-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:55:11 EST 2022  run samtools sort Gmi-CBas_016-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 11:58:42 EST 2022  run samtools index Gmi-CBas_016-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-CBas_079-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:57:14 EST 2022  run samtools sort Gmi-CBas_079-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 11:59:03 EST 2022  run samtools index Gmi-CBas_079-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_012-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:00:03 EST 2022  run samtools sort Gmi-CBat_012-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:01:07 EST 2022  run samtools index Gmi-CBat_012-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_029-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 11:57:51 EST 2022  run samtools sort Gmi-CBas_029-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:00:55 EST 2022  run samtools index Gmi-CBas_029-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-CBat_022-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:01:47 EST 2022  run samtools sort Gmi-CBat_022-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:02:43 EST 2022  run samtools index Gmi-CBat_022-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_034-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:00:07 EST 2022  run samtools sort Gmi-CBas_034-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:03:09 EST 2022  run samtools index Gmi-CBas_034-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-CBat_004-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:02:13 EST 2022  run samtools sort Gmi-CBat_004-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:03:38 EST 2022  run samtools index Gmi-CBat_004-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBat_015-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:03:00 EST 2022  run samtools sort Gmi-CBat_015-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:04:06 EST 2022  run samtools index Gmi-CBat_015-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_005-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:02:54 EST 2022  run samtools sort Gmi-CBat_005-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:04:18 EST 2022  run samtools index Gmi-CBat_005-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBat_023-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:04:04 EST 2022  run samtools sort Gmi-CBat_023-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:05:06 EST 2022  run samtools index Gmi-CBat_023-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_080-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:03:46 EST 2022  run samtools sort Gmi-CBas_080-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:06:03 EST 2022  run samtools index Gmi-CBas_080-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-CBat_024-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:05:17 EST 2022  run samtools sort Gmi-CBat_024-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:06:21 EST 2022  run samtools index Gmi-CBat_024-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_021-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:05:29 EST 2022  run samtools sort Gmi-CBat_021-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:06:36 EST 2022  run samtools index Gmi-CBat_021-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_036-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:06:21 EST 2022  run samtools sort Gmi-CBat_036-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:07:17 EST 2022  run samtools index Gmi-CBat_036-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_025-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:06:48 EST 2022  run samtools sort Gmi-CBat_025-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:07:51 EST 2022  run samtools index Gmi-CBat_025-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_030-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:08:45 EST 2022  run samtools sort Gmi-CBat_030-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:09:48 EST 2022  run samtools index Gmi-CBat_030-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_042-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:09:16 EST 2022  run samtools sort Gmi-CBat_042-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:10:19 EST 2022  run samtools index Gmi-CBat_042-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_013-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:08:38 EST 2022  run samtools sort Gmi-CBat_013-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:10:22 EST 2022  run samtools index Gmi-CBat_013-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_052-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:12:15 EST 2022  run samtools sort Gmi-CBat_052-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:12:59 EST 2022  run samtools index Gmi-CBat_052-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBat_010-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:10:51 EST 2022  run samtools sort Gmi-CBat_010-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:12:47 EST 2022  run samtools index Gmi-CBat_010-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_034-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:11:29 EST 2022  run samtools sort Gmi-CBat_034-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:12:56 EST 2022  run samtools index Gmi-CBat_034-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBat_037-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:11:42 EST 2022  run samtools sort Gmi-CBat_037-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:13:03 EST 2022  run samtools index Gmi-CBat_037-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBas_049-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:09:28 EST 2022  run samtools sort Gmi-CBas_049-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:13:21 EST 2022  run samtools index Gmi-CBas_049-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-CBat_020-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:12:05 EST 2022  run samtools sort Gmi-CBat_020-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:14:00 EST 2022  run samtools index Gmi-CBat_020-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_040-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:12:47 EST 2022  run samtools sort Gmi-CBat_040-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:14:09 EST 2022  run samtools index Gmi-CBat_040-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBat_064-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:13:46 EST 2022  run samtools sort Gmi-CBat_064-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:14:22 EST 2022  run samtools index Gmi-CBat_064-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBat_027-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:14:21 EST 2022  run samtools sort Gmi-CBat_027-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:16:07 EST 2022  run samtools index Gmi-CBat_027-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_061-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:15:33 EST 2022  run samtools sort Gmi-CBat_061-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:16:27 EST 2022  run samtools index Gmi-CBat_061-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_068-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:13:40 EST 2022  run samtools sort Gmi-CBas_068-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:17:00 EST 2022  run samtools index Gmi-CBas_068-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-CBat_062-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:17:25 EST 2022  run samtools sort Gmi-CBat_062-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:18:23 EST 2022  run samtools index Gmi-CBat_062-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBas_095-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:16:09 EST 2022  run samtools sort Gmi-CBas_095-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:18:49 EST 2022  run samtools index Gmi-CBas_095-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBas_082-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:16:41 EST 2022  run samtools sort Gmi-CBas_082-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:19:51 EST 2022  run samtools index Gmi-CBas_082-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-CBat_091-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:21:03 EST 2022  run samtools sort Gmi-CBat_091-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:21:34 EST 2022  run samtools index Gmi-CBat_091-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBat_056-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:20:04 EST 2022  run samtools sort Gmi-CBat_056-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:21:27 EST 2022  run samtools index Gmi-CBat_056-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBat_018-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:18:58 EST 2022  run samtools sort Gmi-CBat_018-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:21:19 EST 2022  run samtools index Gmi-CBat_018-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-CBat_019-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:18:51 EST 2022  run samtools sort Gmi-CBat_019-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:21:31 EST 2022  run samtools index Gmi-CBat_019-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBat_083-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:21:23 EST 2022  run samtools sort Gmi-CBat_083-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:21:58 EST 2022  run samtools index Gmi-CBat_083-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBat_050-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:21:28 EST 2022  run samtools sort Gmi-CBat_050-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:23:12 EST 2022  run samtools index Gmi-CBat_050-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_031-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:20:48 EST 2022  run samtools sort Gmi-CBat_031-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:23:06 EST 2022  run samtools index Gmi-CBat_031-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-CBat_035-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:21:16 EST 2022  run samtools sort Gmi-CBat_035-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:23:34 EST 2022  run samtools index Gmi-CBat_035-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-CBat_088-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:23:49 EST 2022  run samtools sort Gmi-CBat_088-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:24:37 EST 2022  run samtools index Gmi-CBat_088-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBat_071-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:23:16 EST 2022  run samtools sort Gmi-CBat_071-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:24:31 EST 2022  run samtools index Gmi-CBat_071-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_076-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:23:34 EST 2022  run samtools sort Gmi-CBat_076-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:24:40 EST 2022  run samtools index Gmi-CBat_076-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_043-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:22:36 EST 2022  run samtools sort Gmi-CBat_043-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:24:56 EST 2022  run samtools index Gmi-CBat_043-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-CBas_064-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:20:16 EST 2022  run samtools sort Gmi-CBas_064-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:24:42 EST 2022  run samtools index Gmi-CBas_064-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 10 files and 1 in-memory blocks...
+FILE=Gmi-CBas_092-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:21:41 EST 2022  run samtools sort Gmi-CBas_092-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:24:58 EST 2022  run samtools index Gmi-CBas_092-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-CBat_095-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:25:23 EST 2022  run samtools sort Gmi-CBat_095-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:25:57 EST 2022  run samtools index Gmi-CBat_095-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 1 files and 1 in-memory blocks...
+FILE=Gmi-CBat_051-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:23:58 EST 2022  run samtools sort Gmi-CBat_051-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:25:57 EST 2022  run samtools index Gmi-CBat_051-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_047-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:24:10 EST 2022  run samtools sort Gmi-CBat_047-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:26:30 EST 2022  run samtools index Gmi-CBat_047-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-CBas_075-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:22:37 EST 2022  run samtools sort Gmi-CBas_075-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:26:35 EST 2022  run samtools index Gmi-CBas_075-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-CBat_065-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:26:48 EST 2022  run samtools sort Gmi-CBat_065-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:28:29 EST 2022  run samtools index Gmi-CBat_065-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_093-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:27:48 EST 2022  run samtools sort Gmi-CBat_093-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:28:46 EST 2022  run samtools index Gmi-CBat_093-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+FILE=Gmi-CBat_059-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:28:31 EST 2022  run samtools sort Gmi-CBat_059-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:30:22 EST 2022  run samtools index Gmi-CBat_059-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_049-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:28:04 EST 2022  run samtools sort Gmi-CBat_049-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:30:33 EST 2022  run samtools index Gmi-CBat_049-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBat_048-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:28:58 EST 2022  run samtools sort Gmi-CBat_048-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:31:24 EST 2022  run samtools index Gmi-CBat_048-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBat_070-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:30:26 EST 2022  run samtools sort Gmi-CBat_070-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:32:06 EST 2022  run samtools index Gmi-CBat_070-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_082-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:31:58 EST 2022  run samtools sort Gmi-CBat_082-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:33:23 EST 2022  run samtools index Gmi-CBat_082-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 3 files and 1 in-memory blocks...
+FILE=Gmi-CBat_080-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:32:58 EST 2022  run samtools sort Gmi-CBat_080-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:34:40 EST 2022  run samtools index Gmi-CBat_080-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_044-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:32:37 EST 2022  run samtools sort Gmi-CBat_044-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:35:37 EST 2022  run samtools index Gmi-CBat_044-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 7 files and 1 in-memory blocks...
+FILE=Gmi-CBat_066-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:34:04 EST 2022  run samtools sort Gmi-CBat_066-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:36:11 EST 2022  run samtools index Gmi-CBat_066-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-CBat_067-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:35:13 EST 2022  run samtools sort Gmi-CBat_067-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:37:17 EST 2022  run samtools index Gmi-CBat_067-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 5 files and 1 in-memory blocks...
+FILE=Gmi-CBat_094-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:36:11 EST 2022  run samtools sort Gmi-CBat_094-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:37:49 EST 2022  run samtools index Gmi-CBat_094-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 4 files and 1 in-memory blocks...
+FILE=Gmi-CBat_039-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:39:45 EST 2022  run samtools sort Gmi-CBat_039-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:43:19 EST 2022  run samtools index Gmi-CBat_039-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-CBat_046-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:40:42 EST 2022  run samtools sort Gmi-CBat_046-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:44:14 EST 2022  run samtools index Gmi-CBat_046-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 9 files and 1 in-memory blocks...
+FILE=Gmi-CBat_084-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:44:11 EST 2022  run samtools sort Gmi-CBat_084-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:46:52 EST 2022  run samtools index Gmi-CBat_084-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBat_081-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:44:32 EST 2022  run samtools sort Gmi-CBat_081-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 12:47:10 EST 2022  run samtools index Gmi-CBat_081-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 6 files and 1 in-memory blocks...
+FILE=Gmi-CBat_063-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:46:57 EST 2022  run samtools sort Gmi-CBat_063-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 12:50:15 EST 2022  run samtools index Gmi-CBat_063-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 8 files and 1 in-memory blocks...
+FILE=Gmi-CBat_060-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 12:59:26 EST 2022  run samtools sort Gmi-CBat_060-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 13:04:11 EST 2022  run samtools index Gmi-CBat_060-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 12 files and 1 in-memory blocks...
+FILE=Gmi-CBat_096-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 13:02:06 EST 2022  run samtools sort Gmi-CBat_096-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 13:06:24 EST 2022  run samtools index Gmi-CBat_096-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 11 files and 1 in-memory blocks...
+FILE=Gmi-CBat_058-Ex1-cssl2.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 13:25:28 EST 2022  run samtools sort Gmi-CBat_058-Ex1-cssl2.clmp.fp2_repr
+
+Wed Nov 30 13:33:07 EST 2022  run samtools index Gmi-CBat_058-Ex1-cssl2.clmp.fp2_repr
+[bam_sort_core] merging from 19 files and 1 in-memory blocks...
+FILE=Gmi-CBat_079-Ex1-cssl.clmp.fp2_repr
+CUTOFFS=rad.RAW-10-10
+MAPPING_CLIPPING_PENALTY=5
+INSERT_MEAN=649.717
+INSERT_SD=76.9433
+INSERT_MAX=1631
+INSERT_MIN=308
+MAPPING_MIN_ALIGNMENT_SCORE=30
+optA=1
+optB=4
+optO=6
+
+Wed Nov 30 18:42:22 EST 2022  run samtools sort Gmi-CBat_079-Ex1-cssl.clmp.fp2_repr
+
+Wed Nov 30 19:23:02 EST 2022  run samtools index Gmi-CBat_079-Ex1-cssl.clmp.fp2_repr
+[bam_sort_core] merging from 111 files and 1 in-memory blocks...
+
+Wed Nov 30 19:25:40 EST 2022 mkBAM completed!
+
+Compress large filesWed Nov 30 19:25:41 EST 2022
+
+
+* dDocentHPC v4.5 Forked by cbird@tamucc.edu * 
+
+
+Running dDocentHPC fltrBAM...
+ 
+Wed Nov 30 19:25:43 EST 2022 Files output to:  /home/e1garcia/shotgun_PIRE/pire_cssl_data_processing/gazza_minuta/2nd_sequencing_run/mkBAM
+
+Wed Nov 30 19:25:43 EST 2022 Reading config file... 
+ 
+Settings for dDocentHPC
+#Made in notepad++, use for best viewing
+
+These default settings assume ddRAD, no overlapping 151 bp reads
+
+40              Number of Processors (Auto, 1, 2, 3, ..., n threads) cbirdq=40 normal=20
+230G    Maximum Memory (1G,2G,..., 256G)  G=gigabytes
+
+----------trimFQ: Settings for Trimming FASTQ Files---------------------------------------------------------------
+146             trimmomatic MINLEN (integer, mkREF only)                                                Drop the read if it is below a specified length. Set to the length of the Read1 reads.
+75              trimmomatic MINLEN (integer, mkBAM only)                                                Drop the read if it is below a specified length. Set to the minimum frag length you want mapped to the reference.
+20              trimmomatic LEADING:<quality> (integer, mkBAM only)                             Specifies the minimum quality required to keep a base.
+15              trimmomatic TRAILING:<quality> (integer, mkREF only)                    Specifies the minimum quality required to keep a base.
+20              trimmomatic TRAILING:<quality> (integer, mkBAM only)                    Specifies the minimum quality required to keep a base.
+TruSeq3-PE-2.fa trimmomatic ILLUMINACLIP:<fasta> (0, fasta file name)                   Specifies the trimmomatic adapter file to use. entering a 0 (zero) will turn off adapter trimming. Options are: TruSeq3-PE-2.fa, TruSeq3-PE.fa, TruSeq3-SE.fa, TruSeq2-PE.fa, TruSeq2-SE.fa, any other files included with trimmomatic.  Entering a custom path here will break the script. If you want a customized file, you have to put it where the default trimmomatic files are located on your computer.  If you have trouble finding this location, run dDocentHPC trimREF and it will be included in the output.
+2               trimmomatic ILLUMINACLIP:<seed mismatches> (integer)                    specifies the maximum mismatch count which will still allow a full match to be performed
+30              trimmomatic ILLUMINACLIP:<palindrome clip thresh> (integer)             specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment
+10              trimmomatic ILLUMINACLIP:<simple clip thresh> (integer)                 specifies how accurate the match between any adapter etc. sequence must be against a read.
+20              trimmomatic SLIDINGWINDOW:<windowSize> (integer)                                specifies the number of bases to average across
+20              trimmomatic SLIDINGWINDOW:<windowQuality> (integer)                             specifies the average quality required.
+0               trimmomatic CROP:<bp to keep> (integer, mkBAM only)    Trim read sequences down to this length. Enter 0 for no cropping
+0               trimmomatic HEADCROP:<length> (integer, only Read1 for ezRAD)   The number of bases to remove from the start of the read. 0 for ddRAD, 5 for ezRAD
+no              FixStacks (yes,no)                                                                                      Demultiplexing with stacks introduces anomolies.  This removes them.
+------------------------------------------------------------------------------------------------------------------
+
+----------mkREF: Settings for de novo assembly of the reference genome--------------------------------------------
+PE              Type of reads for assembly (PE, SE, OL, RPE)                                    PE=ddRAD & ezRAD pairedend, non-overlapping reads; SE=singleend reads; OL=ddRAD & ezRAD overlapping reads, miseq; RPE=oregonRAD, restriction site + random shear
+0.9             cdhit Clustering_Similarity_Pct (0-1)                                                   Use cdhit to cluster and collapse uniq reads by similarity threshold
+rad               Cutoff1 (integer)                                                                                         Use unique reads that have at least this much coverage for making the reference     genome
+RAW-10-10               Cutoff2 (integer)
+                Use unique reads that occur in at least this many individuals for making the reference genome
+0.05    rainbow merge -r <percentile> (decimal 0-1)                                             Percentile-based minimum number of seqs to assemble in a precluster
+0.95    rainbow merge -R <percentile> (decimal 0-1)                                             Percentile-based maximum number of seqs to assemble in a precluster
+------------------------------------------------------------------------------------------------------------------
+
+----------mkBAM: Settings for mapping the reads to the reference genome-------------------------------------------
+Make sure the cutoffs above match the reference*fasta!
+1               bwa mem -A Mapping_Match_Value (integer)
+4               bwa mem -B Mapping_MisMatch_Value (integer)
+6               bwa mem -O Mapping_GapOpen_Penalty (integer)
+30              bwa mem -T Mapping_Minimum_Alignment_Score (integer)                    Remove reads that have an alignment score less than this.
+5       bwa mem -L Mapping_Clipping_Penalty (integer,integer)
+------------------------------------------------------------------------------------------------------------------
+
+----------fltrBAM: Settings for filtering mapping alignments in the *bam files---------------
+20              samtools view -q        Mapping_Min_Quality (integer)                   Remove reads with mapping qual less than this value
+yes             samtools view -F 4      Remove_unmapped_reads? (yes,no)                 Since the reads aren't mapped, we generally don't need to filter them
+no              samtools view -F 8      Remove_read_pair_if_one_is_unmapped? (yes,no)   If either read in a pair does not map, then the other is also removed
+yes             samtools view -F 256    Remove_secondary_alignments? (yes,no)           Secondary alignments are reads that also map to other contigs in the reference genome
+no              samtools view -F 512    Remove_reads_not_passing_platform_vendor_filters (yes,no)               We generally don't see any of these
+no              samtools view -F 1024   Remove_PCR_or_optical_duplicates? (yes,no)      You probably don't want to set this to yes
+no              samtools view -F 2048   Remove_supplementary_alignments? (yes,no)       We generally don't see any of these
+no              samtools view -f 2      Keep_only_properly_aligned_read_pairs? (yes,no)                         Set to no if OL mode
+0               samtools view -F        Custom_samtools_view_F_bit_value? (integer)                             performed separately from the above, consult samtools man
+0               samtools view -f        Custom_samtools_view_f_bit_value? (integer)                             performed separately from the above, consult samtools man
+30                                      Remove_reads_with_excessive_soft_clipping? (no, integers by 10s)        minimum number of soft clipped bases in a read that is unacceptable
+30                                      Remove_reads_with_alignment_score_below (integer)               Should match bwa mem -T, which sometimes doesn't work
+no                                      Remove_reads_orphaned_by_filters? (yes,no)
+------------------------------------------------------------------------------------------------------------------
+
+----------mkVCF: Settings for variant calling/ genotyping---------------------------------------------------------
+no      freebayes -J --pooled-discrete (yes|no)                         If yes, a pool of individuals is assumed to be the statistical unit of observation.
+no      freebayes -A --cnv-map (filename.bed or no)                     If the pools have different numbers of individuals, then you should provide a copy number variation (cnv) *.bed file with the "ploidy" of each pool. the bed file should be in the working directory and formatted as follows: popmap_column_1 ploidy_of_pool.  If that doesn't work, try the basenames of the files in popmap column 1.
+2       freebayes -p --ploidy (integer)                                 Whether pooled or not, if no cnv-map file is provided, then what is the ploidy of the samples? for pools, this number should be the number of individuals * ploidy
+no      freebayes -r --region (filename.bed or no)                      Limit analysis to specified region.  Bed file format: <chrom>:<start_position>-<end_position>
+0       only genotype read 1 (integer)                                  Limit analysis to only Read 1 positions, integer is maximum Read1 bp position
+0       Minimum Mean Depth of Coverage Per Individual                   Limit analysis to contigs with at least the specified mean depth of coverage per individual
+0       freebayes -n --use-best-n-alleles (integer)                     reduce the number of alleles considered to n, zero means all, set to 2 or more if you run out of memory
+30      freebayes -m --min-mapping-quality (integer)
+20      freebayes -q --min-base-quality (integer)
+-1      freebayes -E --haplotype-length (-1, 3, or integer)             Set to -1 to avoid multi nucleotide polymorphisms and force calling MNPs as SNPs.  Can be set up to half the read length, or more.
+0       freebayes    --min-repeat-entropy (0, 1, or integer)            Set to 0 to avoid multi nucleotide polymorphisms and force calling MNPs as SNPs. To detect interrupted repeats, build across sequence until it has entropy > N bits per bp.
+10      freebayes    --min-coverage (integer)                           Require at least this coverage to process a site
+0.375   freebayes -F --min-alternate-fraction (decimal 0-1)             There must be at least 1 individual with this fraction of alt reads to evaluate the position. If your individuals are barcoded, then use 0.2. If your data is pooled, then set based upon ~ 1/(numIndivids * ploidy) and average depth of coverage
+2       freebayes -C --min-alternate-count (integer)                    Require at least this count of observations supporting an alternate allele within a single individual in order to evaluate the position.  default: 2
+10      freebayes -G --min-alternate-total (integer)                    Require at least this count of observations supporting an alternate allele within the total population in order to use the allele in analysis.  default: 1
+0.33    freebayes -z --read-max-mismatch-fraction (decimal 0-1)         Exclude reads with more than N [0,1] fraction of mismatches where each mismatch has base quality >= mismatch-base-quality-threshold default: 1.0
+20      freebayes -Q --mismatch-base-quality-threshold (integer)        Count mismatches toward --read-mismatch-limit if the base quality of the mismatch is >= Q.  default: 10
+50      freebayes -U --read-mismatch-limit (integer)                    Exclude reads with more than N mismatches where each mismatch has base quality >= mismatch-base-quality-threshold. default: ~unbounded
+20      freebayes ~3 ~~min-alternate-qsum (integer)                     This value is the mean base quality score for alternate reads and will be multiplied by -C to set -3. Description of -3: Require at least this count of observations supporting an alternate allele within a single individual in order to evaluate the position.  default: 2
+50      freebayes -$ --read-snp-limit (integer)                         Exclude reads with more than N base mismatches, ignoring gaps with quality >= mismatch-base-quality-threshold. default: ~unbounded
+20      freebayes -e --read-indel-limit (integer)                       Exclude reads with more than N separate gaps. default: ~unbounded
+no      freebayes -w --hwe-priors-off (no|yes)                          Disable estimation of the probability of the combination arising under HWE given the allele frequency as estimated by observation frequency.
+no      freebayes -V --binomial-obs-priors-off (no|yes)                 Disable incorporation of prior expectations about observations. Uses read placement probability, strand balance probability, and read position (5'-3') probability.
+no      freebayes -a --allele-balance-priors-off (no|yes)               Disable use of aggregate probability of observation balance between alleles as a component of the priors.
+no      freebayes    --no-partial-observations (no|yes)                 Exclude observations which do not fully span the dynamically-determined detection window.  (default, use all observations, dividing partial support across matching haplotypes when generating haplotypes.)
+no      freebayes    --report-monomorphic (no|yes)                      Report even loci which appear to be monomorphic, and report allconsidered alleles, even those which are not in called genotypes. Loci which do not have any potential alternates have '.' for ALT.
+
+------------------------------------------------------------------------------------------------------------------
+
+
+Email
+user@tamucc.edu
+
+Wed Nov 30 19:25:43 EST 2022 Reading in variables from config file...
+
+Wed Nov 30 19:25:43 EST 2022 Checking for all required dDocent software...
+
+ Running CheckDependencies Function...
+
+  The dependency trimmomatic is installed!
+
+  The dependency freebayes is installed!
+
+  The dependency mawk is installed!
+
+  The dependency bwa is installed!
+
+  The dependency samtools is installed!
+
+  The dependency vcftools is installed!
+
+  The dependency rainbow is installed!
+
+  The dependency gnuplot is installed!
+
+  The dependency gawk is installed!
+
+  The dependency seqtk is installed!
+
+  The dependency cd-hit-est is installed!
+
+  The dependency bamToBed is installed!
+
+  The dependency bedtools is installed!
+
+  The dependency coverageBed is installed!
+
+  The dependency parallel is installed!
+
+  The dependency vcfcombine is installed!
+
+  The dependency bamtools is installed!
+
+  The dependency pearRM is installed!
+
+ All dependencies are installed and up to date!
+
+
+Wed Nov 30 19:25:43 EST 2022  Begin main ddocent function
+
+ The HPC version of dDocent will only digest files with particular extensions for particular tasks
+  untouched files for trimming must be *.F.fq.gz and *.R.fq.gz
+  files trimmed for assembly (mkREF) must be *r1.fq.gz *r2.fq.gz
+  files trimmed for mapping (mkBAM) must be *R1.fq.gz *R2.fq.gz
+
+  extensions selected: *.R1.fq.gz *.R2.fq.gz
+
+ The namelist file already exists and was not recreated. 
+  If you experience errors, you should delete the namelist file.
+ 
+ The samples being processed are:
+  Gmi-ABas_001-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_003-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_004-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_008-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_009-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_010-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_011-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_012-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_013-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_014-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_015-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_016-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_017-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_018-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_019-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_022-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_024-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_025-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_026-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_027-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_028-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_029-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_030-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_031-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_032-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_033-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_034-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_035-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_036-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_037-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_038-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_039-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_040-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_041-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_042-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_043-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_045-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_046-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_047-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_048-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_049-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_050-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_051-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_052-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_053-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_055-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_056-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_057-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-ABas_058-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_059-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_060-Ex1-b-cssl2.clmp.fp2_repr
+  Gmi-ABas_061-Ex1-b-cssl.clmp.fp2_repr
+  Gmi-AHam_001-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_002-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_005-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_006-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_007-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_008-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_009-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_012-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_013-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_015-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_016-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_019-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_020-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_021-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_022-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_023-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_024-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_025-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_034-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_036-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_038-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_040-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_043-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_044-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_045-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_046-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_047-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_048-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_049-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_050-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_051-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_052-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_053-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_054-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_056-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_057-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_058-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_059-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_061-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_062-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_063-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_064-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_066-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_067-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_068-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_069-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_070-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_071-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_072-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_073-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_074-Ex1-cssl2.clmp.fp2_repr
+  Gmi-AHam_075-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_076-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_077-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_080-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_081-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_082-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_084-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_086-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_087-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_088-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_090-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_091-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_092-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_093-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_094-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_095-Ex1-cssl.clmp.fp2_repr
+  Gmi-AHam_096-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_003-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_004-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_005-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_006-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_007-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_009-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_010-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_012-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_013-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_014-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_015-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_016-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_017-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_019-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_023-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_024-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_026-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_027-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_028-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_029-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_033-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_034-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_039-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_041-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_045-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_046-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_047-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_048-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_049-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_053-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_054-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_055-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_057-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_058-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_060-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_061-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_064-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_066-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_067-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_068-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_069-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_070-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_071-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_075-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_078-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_079-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_080-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_081-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_082-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_083-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_084-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_085-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_086-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_088-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_089-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_090-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_091-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_092-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBas_093-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_094-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBas_095-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_001-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_002-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_003-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_004-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_005-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_010-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_011-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_012-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_013-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_015-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_018-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_019-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_020-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_021-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_022-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_023-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_024-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_025-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_027-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_030-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_031-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_034-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_035-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_036-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_037-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_039-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_040-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_042-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_043-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_044-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_046-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_047-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_048-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_049-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_050-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_051-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_052-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_056-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_058-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_059-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_060-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_061-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_062-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_063-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_064-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_065-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_066-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_067-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_070-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_071-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_076-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_079-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_080-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_081-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_082-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_083-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_084-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_088-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_091-Ex1-cssl.clmp.fp2_repr
+  Gmi-CBat_093-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_094-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_095-Ex1-cssl2.clmp.fp2_repr
+  Gmi-CBat_096-Ex1-cssl2.clmp.fp2_repr
+
+
+ Wed Nov 30 19:25:44 EST 2022 Filtering raw BAM Files
+
+  Wed Nov 30 19:25:44 EST 2022  Applying Filter 1: removing paired reads mapping to different contigs, secondary, and supplementary alignments
+
+  Wed Nov 30 19:39:35 EST 2022  Applying Filter 2: removing excessively soft clipped reads (and their mates)
+
+   Wed Nov 30 19:39:35 EST 2022  SOFT_CLIP_CUTOFF is 3 * 10
+[bam_sort_core] merging from 2 files and 1 in-memory blocks...
+
+  Wed Nov 30 19:42:31 EST 2022  Indexing the filtered BAM files
+
+Compress large filesWed Nov 30 19:42:38 EST 2022
