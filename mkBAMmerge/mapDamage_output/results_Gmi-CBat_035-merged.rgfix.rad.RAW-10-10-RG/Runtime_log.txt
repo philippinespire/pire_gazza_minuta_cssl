@@ -1,0 +1,11 @@
+2023-10-23 15:31:49,124	INFO	main: Started with the command: /opt/mapdamage2/bin/mapDamage -i Gmi-CBat_035-merged.rgfix.rad.RAW-10-10-RG.bam -r reference.rad.RAW-10-10.fasta -l 150 --rescale --merge-reference-sequences
+2023-10-23 15:43:14,297	DEBUG	main: BAM read in 692.099032 seconds
+2023-10-23 15:43:18,653	INFO	mapdamage.rscript: Performing Bayesian estimates
+2023-10-23 15:43:18,653	DEBUG	mapdamage.rscript: Call: Rscript /opt/mapdamage2/lib/python3.7/site-packages/mapdamage/Rscripts/stats/runGeneral.R --args 30 10000 10 50000 0 0 1 1 0 0 1 12 results_Gmi-CBat_035-merged.rgfix.rad.RAW-10-10-RG/ /opt/mapdamage2/lib/python3.7/site-packages/mapdamage/Rscripts/stats/ results_Gmi-CBat_035-merged.rgfix.rad.RAW-10-10-RG/Stats_out 0 0 0 results_Gmi-CBat_035-merged.rgfix.rad.RAW-10-10-RG/acgt_ratio.csv 0 0
+2023-10-23 16:03:11,686	DEBUG	mapdamage.rscript: Bayesian estimates completed in 1193.032468 seconds
+2023-10-23 16:03:11,687	INFO	mapdamage.rescale: Rescaling BAM: 'Gmi-CBat_035-merged.rgfix.rad.RAW-10-10-RG.bam' -> 'results_Gmi-CBat_035-merged.rgfix.rad.RAW-10-10-RG/Gmi-CBat_035-merged.rgfix.rad.RAW-10-10-RG.rescaled.bam'
+2023-10-23 16:03:11,761	WARNING	mapdamage.rescale: Warning! Assuming the pairs are non-overlapping, facing inwards and correctly paired.
+2023-10-23 16:13:57,543	WARNING	mapdamage.rescale: Number of non-rescaled reads due to improper pairing:  393559
+2023-10-23 16:13:57,600	DEBUG	mapdamage.rescale: Rescaling completed in 645.913064 seconds
+2023-10-23 16:13:57,602	INFO	main: Successful run
+2023-10-23 16:13:57,602	DEBUG	main: Run completed in 2535.404598 seconds

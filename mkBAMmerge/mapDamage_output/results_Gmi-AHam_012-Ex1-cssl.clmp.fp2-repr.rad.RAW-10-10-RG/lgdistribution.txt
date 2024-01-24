@@ -1,0 +1,4 @@
+# table produced by mapDamage version 2.2.1
+# using mapped file Gmi-AHam_012-Ex1-cssl.clmp.fp2-repr.rad.RAW-10-10-RG.bam and reference.rad.RAW-10-10.fasta as reference file
+# Std: strand of reads
+Std	Length	Occurences 

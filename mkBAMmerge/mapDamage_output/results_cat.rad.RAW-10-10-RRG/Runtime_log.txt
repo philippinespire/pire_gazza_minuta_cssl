@@ -1,0 +1,11 @@
+2023-10-23 12:02:40,390	INFO	main: Started with the command: /opt/mapdamage2/bin/mapDamage -i cat.rad.RAW-10-10-RRG.bam -r reference.rad.RAW-10-10.fasta -l 150 --rescale --merge-reference-sequences
+2023-10-24 01:59:22,385	DEBUG	main: BAM read in 50209.569057 seconds
+2023-10-24 01:59:24,467	INFO	mapdamage.rscript: Performing Bayesian estimates
+2023-10-24 01:59:24,468	DEBUG	mapdamage.rscript: Call: Rscript /opt/mapdamage2/lib/python3.7/site-packages/mapdamage/Rscripts/stats/runGeneral.R --args 30 10000 10 50000 0 0 1 1 0 0 1 12 results_cat.rad.RAW-10-10-RRG/ /opt/mapdamage2/lib/python3.7/site-packages/mapdamage/Rscripts/stats/ results_cat.rad.RAW-10-10-RRG/Stats_out 0 0 0 results_cat.rad.RAW-10-10-RRG/acgt_ratio.csv 0 0
+2023-10-24 02:05:39,667	DEBUG	mapdamage.rscript: Bayesian estimates completed in 375.199241 seconds
+2023-10-24 02:05:39,668	INFO	mapdamage.rescale: Rescaling BAM: 'cat.rad.RAW-10-10-RRG.bam' -> 'results_cat.rad.RAW-10-10-RRG/cat.rad.RAW-10-10-RRG.rescaled.bam'
+2023-10-24 02:05:39,738	WARNING	mapdamage.rescale: Warning! Assuming the pairs are non-overlapping, facing inwards and correctly paired.
+2023-10-24 11:40:03,980	WARNING	mapdamage.rescale: Number of non-rescaled reads due to improper pairing:  85423690
+2023-10-24 11:40:04,009	DEBUG	mapdamage.rescale: Rescaling completed in 34464.340484 seconds
+2023-10-24 11:40:04,011	INFO	main: Successful run
+2023-10-24 11:40:04,011	DEBUG	main: Run completed in 85051.195018 seconds
