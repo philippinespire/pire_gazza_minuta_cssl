@@ -1,4 +1,4 @@
-# Generic Data Processing Log
+# Gmi Data Processing Log
 
 Log to track progress through capture bioinformatics pipeline for the Albatross and Contemporary *Gazza minuta* samples from Hamilo Cove & Basud River. Second sequencing run (contains individuals sequenced in the first run as well as some new individuals).
 
@@ -104,6 +104,7 @@ install.packages("tidyverse") #said yes when prompted, when finished, exited & d
 crun R < /home/e1garcia/shotgun_PIRE/pire_fq_gz_processing/checkClumpify_EG.R --no-save
 #all files ran successfully
 ```
+
 All files ran successfully
 
 ---
