@@ -4,6 +4,8 @@ Log to track progress through capture bioinformatics pipeline for the Albatross 
 
 Information on data pre-processing & processing steps prior to merging `.bam` files can be found in the READMEs for the [1st sequencing run](https://github.com/philippinespire/pire_cssl_data_processing/blob/main/gazza_minuta/1st_sequencing_run/README.md) and [2nd sequencing run](https://github.com/philippinespire/pire_cssl_data_processing/blob/main/gazza_minuta/2nd_sequencing_run/README.md) directories.
 
+***Note:** All scripts, code, data now live in the following directory on Wahab:* `/archive/carpenterlab/pire/pire_gazza_minuta_cssl`
+
 ---
 
 ## 10. Merge .bam files from two separate runs
