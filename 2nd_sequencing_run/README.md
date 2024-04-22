@@ -224,8 +224,6 @@ cd /home/e1garcia/shotgun_PIRE/pire_cssl_data_processing/gazza_minuta/2nd_sequen
 sbatch /home/e1garcia/shotgun_PIRE/pire_fq_gz_processing/read_calculator.sh "/home/e1garcia/shotgun_PIRE/pire_cssl_data_processing/gazza_minuta/2nd_sequencing_run" "raw_fq_capture"  
 ```
 
-Generated the [percent_read_loss](URL for read loss table) and [percent_reads_remaining](URL for read remain table) tables.
-
 Reads lost:
 
   * fastp1 dropped 2.30% of the reads
@@ -252,10 +250,6 @@ mv fq_fp1_clmp_fp2_fqscrn_repaired/*fq.gz mkBAM
 Pulled latest changes from dDocentHPC repo & copied `config.5.cssl` over.
 
 ```sh
-#if you haven't already, you first need to clone the dDocentHPC.git repo
-#cd pire_cssl_data_processing/scripts
-#git clone https://github.com/cbirdlab/dDocentHPC.git
-
 #if you have cloned, just pull the latest changes
 cd /pire_cssl_data_procesing/scripts/dDocentHPC
 git pull
@@ -265,7 +259,7 @@ cd /home/e1garcia/shotgun_PIRE/pire_cssl_data_processing/gazza_minuta/2nd_sequen
 cp ../../scripts/dDocentHPC/configs/config.5.cssl .
 ```
 
-Found the best genome by running `wrangleData.R`, sorted tibble by busco single copy complete, quast n50, and filtered by species in Rstudio. The best genome to map to for *spp* is: `<BEST_ASSEMBLY.fasta>` in `<PATH TO DIR WITH BEST GENOME ASSEMBLY`. Copied this to `mkBAM`. In this case, since this is the 2nd sequencing run and GMI does not have an assembled genome, the "raw" reference fasta that was used during the 1st sequencing run was copied and used here. 
+Since this is the 2nd sequencing run and GMI does not have an assembled genome, the "raw" reference fasta that was used during the 1st sequencing run was copied and used here. 
 
 ```sh
 cd /home/e1garcia/shotgun_PIRE/pire_cssl_data_processing/gazza_minuta/2nd_sequencing_run/mkBAM
@@ -276,7 +270,6 @@ cp ../1st_sequencing_run/reference.rad.RAW-10-10.fasta
 #<assembly type> is `ssl` for denovo assembled shotgun library or `rad` for denovo assembled rad library
 #this naming is a little messy, but it makes the ref 100% tracable back to the source
 #it is critical not to use `_` in name of reference for compatibility with ddocent and freebayes
-
 ```
 
 Updated the config file with the ref genome info. The nano from the 1st sequencing run was copied over from 1st sequencing run as well. 
