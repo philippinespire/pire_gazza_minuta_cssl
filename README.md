@@ -8,6 +8,17 @@ Information on data pre-processing & processing steps prior to merging `.bam` fi
 
 ---
 
+## Links to associated metadata:
+1. raw sequences (NCBI GenBank):
+    * Historical samples: [BioProject PRJNA998057](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA998057/)
+    * Contemporary samples: [BioProject PRJNA998814](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA998814/)
+3. metadata (GEOME):
+    * Historical samples: https://n2t.net/ark:/21547/FMB2
+    * Contemporary samples: https://n2t.net/ark:/21547/FMH2
+4. genome assembly used for mapping & genotype calls (Figshare): [DOI:10.6084/m9.figshare.29991607](https://doi.org/10.6084/m9.figshare.29991607.v1)
+
+---
+
 ## 10. Merge .bam files from two separate runs
 
 Ran the merge script:
